@@ -14,13 +14,17 @@ export default function LifestyleSection({ products }: { products: Product[] }) 
 
       {/* Row 1: Full-bleed dark — man in sweatshirt at camping */}
       <div className="relative overflow-hidden min-h-[580px] flex items-center bg-arvenzo-dark">
-        <Image
-          src="/images/man-sweatshirt.jpg"
-          alt="Man in Arvenzo sweatshirt"
-          fill
-          className="object-cover object-[50%_30%] opacity-75"
-          sizes="100vw"
-        />
+        {/* inset-[-30%] = wrapper extends 30% beyond container on every side
+            → image must fill 160% of container → looks ~63% zoomed out */}
+        <div className="absolute inset-[-30%]">
+          <Image
+            src="/images/man-sweatshirt.jpg"
+            alt="Man in Arvenzo sweatshirt"
+            fill
+            className="object-cover object-[50%_40%] opacity-75"
+            sizes="100vw"
+          />
+        </div>
         <div className="absolute inset-0 bg-gradient-to-r from-arvenzo-dark/85 via-arvenzo-dark/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 w-full py-20">
           <div className="max-w-lg">
@@ -50,13 +54,15 @@ export default function LifestyleSection({ products }: { products: Product[] }) 
       <div className="grid grid-cols-1 md:grid-cols-2">
         {/* Woman with hoodie */}
         <div className="relative overflow-hidden min-h-[500px] group">
-          <Image
-            src="/images/woman-hoodie.jpg"
-            alt="Vrouw in Arvenzo hoodie"
-            fill
-            className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
+          <div className="absolute inset-[-20%] transition-transform duration-700 group-hover:scale-105">
+            <Image
+              src="/images/woman-hoodie.jpg"
+              alt="Vrouw in Arvenzo hoodie"
+              fill
+              className="object-cover object-center"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-arvenzo-dark/75 via-arvenzo-dark/10 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-8">
             <p className="text-arvenzo-orange text-[11px] uppercase tracking-widest font-sans mb-1">Bestseller</p>
@@ -76,13 +82,15 @@ export default function LifestyleSection({ products }: { products: Product[] }) 
 
         {/* Woman with mug */}
         <div className="relative overflow-hidden min-h-[500px] group">
-          <Image
-            src="/images/woman-mug.jpg"
-            alt="Vrouw met Arvenzo mug"
-            fill
-            className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
+          <div className="absolute inset-[-20%] transition-transform duration-700 group-hover:scale-105">
+            <Image
+              src="/images/woman-mug.jpg"
+              alt="Vrouw met Arvenzo mug"
+              fill
+              className="object-cover object-center"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-arvenzo-dark/75 via-arvenzo-dark/10 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-8">
             <p className="text-arvenzo-orange text-[11px] uppercase tracking-widest font-sans mb-1">Cadeau tip</p>
