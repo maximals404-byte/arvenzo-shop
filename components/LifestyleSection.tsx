@@ -49,12 +49,12 @@ export default function LifestyleSection({ products }: { products: Product[] }) 
       {/* Row 2: Two columns — woman hoodie + woman mug */}
       <div className="grid grid-cols-1 md:grid-cols-2">
         {/* Woman with hoodie */}
-        <div className="relative overflow-hidden min-h-[500px] bg-arvenzo-dark group">
+        <div className="relative overflow-hidden aspect-square group">
           <Image
             src="/images/woman-hoodie.jpg"
             alt="Vrouw in Arvenzo hoodie"
             fill
-            className="object-cover object-center transition-transform duration-700 scale-75 group-hover:scale-[0.79]"
+            className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, 50vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-arvenzo-dark/75 via-arvenzo-dark/10 to-transparent" />
@@ -75,12 +75,12 @@ export default function LifestyleSection({ products }: { products: Product[] }) 
         </div>
 
         {/* Woman with mug */}
-        <div className="relative overflow-hidden min-h-[500px] bg-arvenzo-dark group">
+        <div className="relative overflow-hidden aspect-square group">
           <Image
             src="/images/woman-mug.jpg"
             alt="Vrouw met Arvenzo mug"
             fill
-            className="object-cover object-center transition-transform duration-700 scale-75 group-hover:scale-[0.79]"
+            className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, 50vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-arvenzo-dark/75 via-arvenzo-dark/10 to-transparent" />
