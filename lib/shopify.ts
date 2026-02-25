@@ -36,7 +36,7 @@ function normalizeJSONProduct(p: ShopifyJSONProduct): Product {
       availableForSale: v.available,
       selectedOptions: p.options.map((o, i) => ({
         name: o.name,
-        value: (v as Record<string, string>)[`option${i + 1}`] ?? '',
+        value: (v as unknown as Record<string, string>)[`option${i + 1}`] ?? '',
       })),
     })),
     productType: p.product_type,
