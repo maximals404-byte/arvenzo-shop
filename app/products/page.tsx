@@ -37,7 +37,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       )
     : allProducts;
 
-  const categories = [...new Set(allProducts.map((p) => p.productType).filter(Boolean))];
+  const categories = Array.from(new Set(allProducts.map((p) => p.productType).filter(Boolean)));
 
   return (
     <div className="pt-24 pb-20 min-h-screen bg-arvenzo-light">
