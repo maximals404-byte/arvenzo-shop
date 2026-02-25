@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ShoppingBag, Menu, X } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import clsx from 'clsx';
@@ -16,19 +17,27 @@ const NAV = [
 
 export default function Header() {
   const { totalQuantity, openCart } = useCart();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // Only homepage gets the transparent-hero treatment
+  const isHome = pathname === '/';
+
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 50);
-    fn(); // run on mount
+    fn();
     window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);
   }, []);
 
-  // When at top: white text (hero is dark). When scrolled: dark text on glass.
-  const textColor = scrolled ? 'text-arvenzo-ink' : 'text-arvenzo-cream';
-  const logoHover = scrolled ? 'hover:text-arvenzo-brown' : 'hover:text-arvenzo-orange';
+  // Non-home pages always look "scrolled" (glass + dark text)
+  const effectivelyScrolled = !isHome || scrolled;
+
+  const textColor = effectivelyScrolled ? 'text-arvenzo-ink' : 'text-arvenzo-cream';
+  const navColor = effectivelyScrolled
+    ? 'text-arvenzo-ink/70 hover:text-arvenzo-brown'
+    : 'text-arvenzo-cream/80 hover:text-arvenzo-cream';
 
   return (
     <>
@@ -40,44 +49,34 @@ export default function Header() {
       {/* Main header */}
       <header
         className={clsx(
-          'fixed top-[36px] left-0 right-0 z-40 transition-all duration-500',
-          scrolled
+          'fixed top-[36px] left-0 right-0 z-40 transition-all duration-300',
+          effectivelyScrolled
             ? 'glass shadow-[0_1px_0_rgba(93,43,9,0.08)]'
-            : 'bg-gradient-to-b from-black/30 to-transparent'
+            : 'bg-gradient-to-b from-black/40 to-transparent'
         )}
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between h-[60px]">
-          {/* Logo */}
           <Link
             href="/"
-            className={clsx('font-heading font-black text-xl tracking-[0.15em] transition-colors', textColor, logoHover)}
+            className={clsx('font-heading font-black text-xl tracking-[0.15em] transition-colors', textColor,
+              effectivelyScrolled ? 'hover:text-arvenzo-brown' : 'hover:text-arvenzo-orange'
+            )}
           >
             ARVENZO
           </Link>
 
-          {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-7">
             {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={clsx(
-                  'text-[13px] font-sans font-medium transition-colors tracking-wide',
-                  scrolled
-                    ? 'text-arvenzo-ink/70 hover:text-arvenzo-brown'
-                    : 'text-arvenzo-cream/80 hover:text-arvenzo-cream'
-                )}
+              <Link key={item.href} href={item.href}
+                className={clsx('text-[13px] font-sans font-medium transition-colors tracking-wide', navColor)}
               >
                 {item.label}
               </Link>
             ))}
           </nav>
 
-          {/* Right actions */}
           <div className="flex items-center gap-1">
-            <button
-              onClick={openCart}
-              aria-label="Winkelwagen"
+            <button onClick={openCart} aria-label="Winkelwagen"
               className={clsx('relative p-2.5 transition-colors', textColor)}
             >
               <ShoppingBag size={21} strokeWidth={1.5} />
@@ -87,9 +86,7 @@ export default function Header() {
                 </span>
               )}
             </button>
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Menu"
+            <button onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu"
               className={clsx('lg:hidden p-2.5 transition-colors', textColor)}
             >
               {mobileOpen ? <X size={21} strokeWidth={1.5} /> : <Menu size={21} strokeWidth={1.5} />}
@@ -105,11 +102,8 @@ export default function Header() {
       )}>
         <nav className="flex flex-col px-8 pt-10 gap-1">
           {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              className="font-heading font-bold text-4xl text-arvenzo-ink hover:text-arvenzo-brown transition-colors py-2 border-b border-arvenzo-cream-dark last:border-0"
+            <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}
+              className="font-heading font-bold text-4xl text-arvenzo-ink hover:text-arvenzo-brown transition-colors py-3 border-b border-arvenzo-cream-dark last:border-0"
             >
               {item.label}
             </Link>

@@ -4,6 +4,7 @@ import { getProductByHandle, getAllProducts, formatPrice, getDiscountPercentage 
 import ProductGallery from '@/components/ProductGallery';
 import ProductDetailClient from './ProductDetailClient';
 import ProductCard from '@/components/ProductCard';
+import ProductUpsell from '@/components/ProductUpsell';
 import type { Product } from '@/lib/types';
 
 interface PageProps { params: { handle: string } }
@@ -143,6 +144,8 @@ export default async function ProductPage({ params }: PageProps) {
                 <p>• Retourneren binnen 14 dagen na ontvangst</p>
               </div>
             </details>
+
+            <ProductUpsell currentProduct={product} allProducts={allProducts} />
           </div>
         </div>
 
