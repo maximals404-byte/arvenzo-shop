@@ -101,3 +101,29 @@ export interface CartItem {
 
 // Legacy compat
 export type ShopifyProduct = Product;
+
+// ─── Judge.me types ───────────────────────────────────────────────────────────
+
+export interface JudgeMeReview {
+  id: number;
+  title: string;
+  body: string;
+  rating: number;
+  reviewer: {
+    name: string;
+  };
+  created_at: string;
+  verified_buyer: boolean;
+}
+
+export interface JudgeMeApiResponse {
+  reviews: JudgeMeReview[];
+  rating: number;
+  count: number;
+}
+
+export interface JudgeMeAggregated {
+  reviews: JudgeMeReview[];
+  averageRating: number;
+  totalCount: number;
+}

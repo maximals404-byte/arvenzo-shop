@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import MerchantBadge from '@/components/MerchantBadge';
 
 export default function Footer() {
   return (
@@ -18,6 +19,7 @@ export default function Footer() {
                 </a>
               ))}
             </div>
+            <MerchantBadge />
           </div>
 
           {[
