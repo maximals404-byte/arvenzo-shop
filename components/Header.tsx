@@ -9,10 +9,9 @@ import clsx from 'clsx';
 
 const NAV = [
   { href: '/products', label: 'Shop' },
-  { href: '/products?type=Hoodies', label: 'Hoodies' },
-  { href: '/products?type=Sweatshirts', label: 'Sweatshirts' },
-  { href: '/products?type=Unisex-Shirts', label: 'Shirts' },
-  { href: '/products?type=Trinkgef%C3%A4%C3%9Fe', label: 'Mugs' },
+  { href: '/about', label: 'Ons verhaal' },
+  { href: '/faq', label: 'FAQ' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 export default function Header() {

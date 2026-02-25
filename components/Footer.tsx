@@ -1,118 +1,94 @@
 import Link from 'next/link';
 import MerchantBadge from '@/components/MerchantBadge';
 
+/* ─── Payment icons ──────────────────────────────────────────────────────────
+   Only the methods active on Belgian Shopify Payments.
+   All icons: 46×30px, rounded corners, flat design.
+   ─────────────────────────────────────────────────────────────────────────── */
+
 function IconVisa() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Visa">
+    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Visa">
       <rect width="46" height="30" rx="4" fill="white"/>
-      <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#D1D5DB" strokeWidth=".5"/>
-      <text x="23" y="20" textAnchor="middle" fill="#1A1F71" fontSize="14" fontWeight="800" fontFamily="Arial,sans-serif" fontStyle="italic">VISA</text>
+      <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#E0E0E0" strokeWidth=".7"/>
+      {/* Visa blue bar bottom */}
+      <rect x="0" y="21" width="46" height="9" rx="0" fill="#1A1F71"/>
+      <rect x="0" y="21" width="46" height="9" fill="#1A1F71"/>
+      <path d="M0 25h46v1H0z" fill="#F7A800"/>
+      {/* VISA wordmark – bold italic navy */}
+      <text x="23" y="17" textAnchor="middle" fontFamily="Arial Black,Arial,sans-serif" fontWeight="900" fontStyle="italic" fontSize="13" fill="#1A1F71">VISA</text>
     </svg>
   );
 }
 
 function IconMastercard() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Mastercard">
+    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Mastercard">
       <rect width="46" height="30" rx="4" fill="white"/>
-      <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#D1D5DB" strokeWidth=".5"/>
-      <circle cx="18" cy="15" r="8" fill="#EB001B"/>
-      <circle cx="28" cy="15" r="8" fill="#F79E1B"/>
-      <path d="M23 8.4a8 8 0 0 1 0 13.2A8 8 0 0 1 23 8.4z" fill="#FF5F00"/>
+      <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#E0E0E0" strokeWidth=".7"/>
+      <circle cx="18" cy="15" r="9" fill="#EB001B"/>
+      <circle cx="28" cy="15" r="9" fill="#F79E1B"/>
+      {/* overlap blend */}
+      <path d="M23 7.4a9 9 0 0 1 0 15.2A9 9 0 0 1 23 7.4z" fill="#FF5F00"/>
     </svg>
   );
 }
 
 function IconBancontact() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Bancontact">
+    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Bancontact">
       <rect width="46" height="30" rx="4" fill="#005498"/>
-      <path d="M0 20h46v6a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4v-6z" fill="#F5CB00"/>
-      <text x="23" y="14" textAnchor="middle" fill="white" fontSize="6.5" fontWeight="700" fontFamily="Arial,sans-serif" letterSpacing=".3">Bancontact</text>
-      <text x="23" y="26" textAnchor="middle" fill="#005498" fontSize="7" fontWeight="800" fontFamily="Arial,sans-serif">BC</text>
+      {/* Yellow bottom */}
+      <path d="M0 20h46v6a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4v-6z" fill="#FEC910"/>
+      {/* BC text white */}
+      <text x="23" y="15" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="700" fontSize="9" fill="white" letterSpacing=".5">Bancontact</text>
+      {/* BC on yellow */}
+      <text x="23" y="26.5" textAnchor="middle" fontFamily="Arial Black,sans-serif" fontWeight="900" fontSize="8" fill="#005498">BC</text>
     </svg>
   );
 }
 
 function IconMaestro() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Maestro">
+    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Maestro">
       <rect width="46" height="30" rx="4" fill="white"/>
-      <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#D1D5DB" strokeWidth=".5"/>
-      <circle cx="19" cy="13" r="7" fill="#0099DF"/>
-      <circle cx="27" cy="13" r="7" fill="#EB001B" fillOpacity=".85"/>
-      <text x="23" y="26" textAnchor="middle" fill="#333" fontSize="6" fontWeight="600" fontFamily="Arial,sans-serif">Maestro</text>
-    </svg>
-  );
-}
-
-function IconPayPal() {
-  return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="PayPal">
-      <rect width="46" height="30" rx="4" fill="white"/>
-      <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#D1D5DB" strokeWidth=".5"/>
-      <text x="12" y="19" fill="#003087" fontSize="12" fontWeight="800" fontFamily="Arial,sans-serif" fontStyle="italic">P</text>
-      <text x="18" y="19" fill="#009CDE" fontSize="12" fontWeight="800" fontFamily="Arial,sans-serif" fontStyle="italic">P</text>
-      <text x="23" y="19" fill="#003087" fontSize="9" fontWeight="600" fontFamily="Arial,sans-serif">ayPal</text>
-    </svg>
-  );
-}
-
-function IconAmex() {
-  return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="American Express">
-      <rect width="46" height="30" rx="4" fill="#2E77BC"/>
-      <text x="23" y="19" textAnchor="middle" fill="white" fontSize="9.5" fontWeight="700" fontFamily="Arial,sans-serif" letterSpacing="1">AMEX</text>
+      <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#E0E0E0" strokeWidth=".7"/>
+      <circle cx="19" cy="13" r="8" fill="#0099DF"/>
+      <circle cx="27" cy="13" r="8" fill="#EB001B" fillOpacity=".88"/>
+      <text x="23" y="27" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="600" fontSize="6.5" fill="#555">Maestro</text>
     </svg>
   );
 }
 
 function IconApplePay() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Apple Pay">
+    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Apple Pay">
       <rect width="46" height="30" rx="4" fill="#000"/>
-      <path d="M16.5 10.5c.6-.7 1-1.7.9-2.7-.9.1-2 .6-2.6 1.3-.6.6-1.1 1.6-1 2.6 1 .1 2-.5 2.7-1.2z" fill="white"/>
-      <path d="M17.4 11.8c-1.5-.1-2.7.8-3.4.8-.7 0-1.8-.8-3-.8-1.5 0-2.9.9-3.7 2.2-1.6 2.7-.4 6.8 1.1 9 .8 1.1 1.7 2.3 2.9 2.3 1.1 0 1.6-.7 3-.7 1.4 0 1.8.7 2.9.7 1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.5 1.3-2.6-.1 0-2.5-1-2.5-3.7 0-2.3 1.9-3.5 2-3.5-.9-1.5-2.5-1.4-2.5-1.4z" fill="white"/>
-      <text x="30" y="19" textAnchor="middle" fill="white" fontSize="8" fontWeight="500" fontFamily="Arial,sans-serif" letterSpacing=".5">Pay</text>
+      {/* Simplified Apple logo path */}
+      <path d="M17.2 10.1c.7-.9 1.1-2 1-3.1-1 .1-2.2.7-2.9 1.5-.7.8-1.2 1.8-1.1 2.9 1.1.1 2.3-.5 3-1.3z" fill="white"/>
+      <path d="M18.2 11.6c-1.7-.1-3.1 1-3.9 1-.8 0-2-.9-3.3-.9-1.7.1-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.3 1.9 2.7 3.3 2.7 1.3-.1 1.8-.8 3.3-.8s2 .8 3.3.8c1.4-.1 2.3-1.3 3.2-2.6 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4.1 0-2.5 2.1-3.8 2.2-3.9-1.1-1.5-2.9-1.6-3.9-1.1z" fill="white"/>
+      <text x="34" y="19" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="500" fontSize="8" fill="white">Pay</text>
     </svg>
   );
 }
 
 function IconGooglePay() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Google Pay">
+    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Google Pay">
       <rect width="46" height="30" rx="4" fill="white"/>
-      <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#D1D5DB" strokeWidth=".5"/>
-      <text x="8" y="20" fill="#4285F4" fontSize="12" fontWeight="700" fontFamily="Arial,sans-serif">G</text>
-      <text x="17" y="20" fill="#555" fontSize="9" fontWeight="500" fontFamily="Arial,sans-serif">Pay</text>
+      <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#E0E0E0" strokeWidth=".7"/>
+      {/* G in Google colors */}
+      <path d="M18 11.5h-4.5v2.1h2.6c-.3 1.5-1.5 2.4-2.6 2.4-1.6 0-2.9-1.3-2.9-2.9s1.3-2.9 2.9-2.9c.7 0 1.3.3 1.8.7l1.5-1.5C15.7 8.5 14.6 8 13.4 8 10.5 8 8 10.5 8 13.5s2.5 5.5 5.4 5.5c3.1 0 5.1-2.2 5.1-5.4 0-.4 0-.7-.1-1.1H18z" fill="#4285F4"/>
+      <text x="30" y="19" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="500" fontSize="8.5" fill="#444">Pay</text>
     </svg>
   );
 }
 
 function IconShopPay() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Shop Pay">
+    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Shop Pay">
       <rect width="46" height="30" rx="4" fill="#5C6AC4"/>
-      <text x="23" y="19" textAnchor="middle" fill="white" fontSize="7.5" fontWeight="700" fontFamily="Arial,sans-serif" letterSpacing=".3">Shop Pay</text>
-    </svg>
-  );
-}
-
-function IconKlarna() {
-  return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Klarna">
-      <rect width="46" height="30" rx="4" fill="#FFB3C7"/>
-      <text x="23" y="20" textAnchor="middle" fill="#17120E" fontSize="10" fontWeight="700" fontFamily="Arial,sans-serif">Klarna</text>
-    </svg>
-  );
-}
-
-function IconIdeal() {
-  return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="iDEAL">
-      <rect width="46" height="30" rx="4" fill="white"/>
-      <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#D1D5DB" strokeWidth=".5"/>
-      <text x="23" y="20" textAnchor="middle" fill="#C0006D" fontSize="12" fontWeight="800" fontFamily="Arial,sans-serif">iDEAL</text>
+      <text x="23" y="19" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="700" fontSize="7.5" fill="white" letterSpacing=".3">Shop Pay</text>
     </svg>
   );
 }
@@ -122,13 +98,15 @@ const PAYMENT_ICONS = [
   <IconMastercard key="mc" />,
   <IconBancontact key="bc" />,
   <IconMaestro key="maestro" />,
-  <IconPayPal key="paypal" />,
-  <IconAmex key="amex" />,
   <IconApplePay key="applepay" />,
   <IconGooglePay key="gpay" />,
   <IconShopPay key="shoppay" />,
-  <IconKlarna key="klarna" />,
-  <IconIdeal key="ideal" />,
+];
+
+const SOCIALS = [
+  { label: 'Instagram', href: 'https://instagram.com/arvenzo_eu' },
+  { label: 'Facebook', href: 'https://facebook.com/arvenzo' },
+  { label: 'TikTok', href: 'https://tiktok.com/@arvenzo' },
 ];
 
 export default function Footer() {
@@ -142,10 +120,10 @@ export default function Footer() {
               Avontuur en rust in elk ontwerp. Belgisch merk, gedrukt in Europa.
             </p>
             <div className="flex gap-3 mt-5">
-              {['Instagram', 'Facebook', 'TikTok'].map(s => (
-                <a key={s} href={`https://${s.toLowerCase()}.com/arvenzo.be`} target="_blank" rel="noopener noreferrer"
+              {SOCIALS.map(s => (
+                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
                   className="text-[11px] text-arvenzo-cream/30 hover:text-arvenzo-orange transition-colors font-sans tracking-widest uppercase">
-                  {s}
+                  {s.label}
                 </a>
               ))}
             </div>
@@ -177,9 +155,10 @@ export default function Footer() {
               title: 'Info',
               links: [
                 ['Ons verhaal', '/about'],
+                ['Bedrijfsgegevens', '/bedrijfsgegevens'],
                 ['Privacybeleid', '/privacy'],
                 ['Algemene voorwaarden', '/terms'],
-                ['Cookiebeleid', '/privacy#cookies'],
+                ['Herroepingsrecht', '/returns'],
               ],
             },
           ].map((col) => (
@@ -210,15 +189,14 @@ export default function Footer() {
         <div className="border-t border-white/5 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[11px] text-arvenzo-cream/20 font-sans">
           <div className="space-y-1">
             <span className="block">© {new Date().getFullYear()} Arvenzo · Van Eylen Jonas · Pandhoevestraat 62, 3130 Begijnendijk, België</span>
-            <span className="block">KBO: 1027.570.389 · BTW: BE1027.570.389 · support@arvenzo.eu · +32 16 98 24 90</span>
-            <span className="block">Belgisch recht van toepassing · Bevoegde rechtbank: arrondissement Leuven</span>
+            <span className="block">KBO: 1027.570.389 · BTW: BE1027.570.389 · support@arvenzo.eu</span>
             <span className="block">
-              Alle prijzen zijn inclusief BTW ·{' '}
-              <Link href="/privacy" className="hover:text-arvenzo-orange/60 transition-colors">Privacybeleid</Link>
+              Belgisch recht van toepassing · Bevoegde rechtbank: arrondissement Leuven ·{' '}
+              <Link href="/bedrijfsgegevens" className="hover:text-arvenzo-orange/60 transition-colors">Bedrijfsgegevens</Link>
               {' · '}
-              <Link href="/terms" className="hover:text-arvenzo-orange/60 transition-colors">Algemene voorwaarden</Link>
+              <Link href="/privacy" className="hover:text-arvenzo-orange/60 transition-colors">Privacy</Link>
               {' · '}
-              <Link href="/returns" className="hover:text-arvenzo-orange/60 transition-colors">Herroepingsrecht</Link>
+              <Link href="/terms" className="hover:text-arvenzo-orange/60 transition-colors">Voorwaarden</Link>
             </span>
           </div>
           <div className="shrink-0 text-arvenzo-cream/10 text-[10px]">

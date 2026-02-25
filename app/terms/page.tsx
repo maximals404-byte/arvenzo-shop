@@ -35,7 +35,7 @@ export default function TermsPage() {
               <li>• <strong className="text-arvenzo-ink">Ondernemingsnummer (KBO):</strong> 1027.570.389</li>
               <li>• <strong className="text-arvenzo-ink">BTW-nummer:</strong> BE1027.570.389</li>
               <li>• <strong className="text-arvenzo-ink">E-mail:</strong> <a href="mailto:support@arvenzo.eu" className="text-arvenzo-brown hover:underline">support@arvenzo.eu</a></li>
-              <li>• <strong className="text-arvenzo-ink">Telefoon:</strong> <a href="tel:+3216982490" className="text-arvenzo-brown hover:underline">+32 16 98 24 90</a></li>
+              <li>• <strong className="text-arvenzo-ink">Telefoon:</strong> +32 456 88 25 18 (geen telefonisch klantcontact)</li>
             </ul>
           </section>
 

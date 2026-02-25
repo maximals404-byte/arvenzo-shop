@@ -18,7 +18,7 @@ const faqs = [
   },
   {
     v: 'Kan ik mijn bestelling retourneren?',
-    a: 'Ja, je kunt retourneren binnen 14 dagen na ontvangst. Het product moet ongedragen en ongewassen zijn. Neem contact op via info@arvenzo.be om een retour aan te melden.',
+    a: 'Ja, je kunt retourneren binnen 14 dagen na ontvangst. Het product moet ongedragen en ongewassen zijn. Neem contact op via support@arvenzo.eu om een retour aan te melden.',
   },
   {
     v: 'Hoe worden de producten gemaakt?',
@@ -26,7 +26,7 @@ const faqs = [
   },
   {
     v: 'Kan ik mijn bestelling wijzigen of annuleren?',
-    a: 'Neem zo snel mogelijk contact op via info@arvenzo.be. Zodra de productie gestart is, kan een bestelling niet meer worden gewijzigd of geannuleerd.',
+    a: 'Neem zo snel mogelijk contact op via support@arvenzo.eu. Zodra de productie gestart is, kan een bestelling niet meer worden gewijzigd of geannuleerd.',
   },
   {
     v: 'Hoe was ik mijn Arvenzo-producten?',
@@ -38,7 +38,7 @@ const faqs = [
   },
   {
     v: 'Ik heb een defect product ontvangen. Wat nu?',
-    a: 'Stuur een foto van het defect naar info@arvenzo.be met je ordernummer. We sturen gratis een vervangend product of betalen het volledige bedrag terug.',
+    a: 'Stuur een foto van het defect naar support@arvenzo.eu met je ordernummer. We sturen gratis een vervangend product of betalen het volledige bedrag terug.',
   },
 ];
 

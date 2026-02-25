@@ -28,8 +28,8 @@ export default function ShippingPage() {
             <h2 className="font-heading font-bold text-xl text-arvenzo-ink mb-4">1. Verwerkingstijd</h2>
             <p className="mb-3">De verwerkingstijd is de periode tussen de ontvangst van uw bestelling en het moment dat het pakket aan de vervoerder wordt overhandigd.</p>
             <ul className="space-y-2">
-              <li>• <strong className="text-arvenzo-ink">Standaard verwerkingstijd:</strong> Alle bestellingen worden verwerkt binnen <strong className="text-arvenzo-ink">2 tot 14 werkdagen</strong>.</li>
-              <li>• <strong className="text-arvenzo-ink">Cut-off tijden:</strong> Bestellingen geplaatst na 16:00 uur op werkdagen worden vanaf de eerstvolgende werkdag in behandeling genomen.</li>
+              <li>• <strong className="text-arvenzo-ink">Standaard verwerkingstijd:</strong> Alle bestellingen worden verwerkt binnen <strong className="text-arvenzo-ink">1 tot 6 werkdagen</strong> (productietijd).</li>
+              <li>• <strong className="text-arvenzo-ink">Cut-off tijden:</strong> Bestellingen geplaatst na <strong className="text-arvenzo-ink">12:00 uur</strong> op werkdagen worden vanaf de eerstvolgende werkdag in behandeling genomen.</li>
               <li>• <strong className="text-arvenzo-ink">Uitzonderingen:</strong> Tijdens drukke perioden (feestdagen, acties, weekends) of bij gepersonaliseerde artikelen kan de verwerkingstijd afwijken.</li>
             </ul>
           </section>
@@ -47,9 +47,9 @@ export default function ShippingPage() {
                 </thead>
                 <tbody className="divide-y divide-arvenzo-cream-dark">
                   {[
-                    ['België', '1 tot 14 werkdagen'],
-                    ['Nederland', '1 tot 14 werkdagen'],
-                    ['Andere EU-landen', '1 tot 14 werkdagen'],
+                    ['België', 'Gem. 3–5 werkdagen na verzending'],
+                    ['Nederland', 'Gem. 3–5 werkdagen na verzending'],
+                    ['Andere EU-landen', 'Gem. 3–7 werkdagen na verzending'],
                   ].map(([land, tijd]) => (
                     <tr key={land} className="bg-arvenzo-cream hover:bg-arvenzo-cream-dark/40 transition-colors">
                       <td className="px-5 py-3 text-arvenzo-ink font-medium">{land}</td>
@@ -111,7 +111,7 @@ export default function ShippingPage() {
               <p><strong className="text-arvenzo-ink">Arvenzo</strong> · Van Eylen Jonas</p>
               <p>Pandhoevestraat 62, 3130 Begijnendijk, België</p>
               <p>E-mail: <a href="mailto:support@arvenzo.eu" className="text-arvenzo-brown hover:underline">support@arvenzo.eu</a></p>
-              <p>Tel: <a href="tel:+3216982490" className="text-arvenzo-brown hover:underline">+32 16 98 24 90</a></p>
+              <p>Tel: <a href="tel:+32456882518" className="text-arvenzo-brown hover:underline">+32 456 88 25 18</a></p>
               <p>Website: www.arvenzo.be</p>
             </div>
           </div>
