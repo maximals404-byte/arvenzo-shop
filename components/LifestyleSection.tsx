@@ -18,7 +18,7 @@ export default function LifestyleSection({ products }: { products: Product[] }) 
           src="/images/man-sweatshirt.jpg"
           alt="Man in Arvenzo sweatshirt"
           fill
-          className="object-cover object-[50%_25%] opacity-75"
+          className="object-cover object-top opacity-75"
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-arvenzo-dark/85 via-arvenzo-dark/40 to-transparent" />
@@ -103,14 +103,16 @@ export default function LifestyleSection({ products }: { products: Product[] }) 
 
       {/* Row 3: Man in forest shirt — full-bleed light */}
       <div className="relative overflow-hidden min-h-[500px] flex items-center bg-[#EBE5DF]">
-        <Image
-          src="/images/man-shirt.jpg"
-          alt="Man in Arvenzo shirt in het bos"
-          fill
-          className="object-cover object-right"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#EBE5DF] via-[#EBE5DF]/80 to-[#EBE5DF]/10" />
+        <div className="absolute right-0 top-0 bottom-0 w-1/2 md:w-[45%]">
+          <Image
+            src="/images/man-shirt.jpg"
+            alt="Man in Arvenzo shirt in het bos"
+            fill
+            className="object-cover object-left"
+            sizes="50vw"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#EBE5DF]/20 to-[#EBE5DF]" />
         <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 w-full py-20">
           <div className="max-w-md">
             <p className="text-arvenzo-orange text-[11px] font-sans font-medium uppercase tracking-[0.2em] mb-4">
