@@ -12,36 +12,48 @@ export default function LifestyleSection({ products }: { products: Product[] }) 
   return (
     <section className="bg-arvenzo-cream">
 
-      {/* Row 1: Full-bleed dark — man in sweatshirt at camping */}
-      <div className="relative overflow-hidden min-h-[580px] flex items-center bg-arvenzo-dark">
-        <Image
-          src="/images/man-sweatshirt.jpg"
-          alt="Man in Arvenzo sweatshirt"
-          fill
-          className="object-cover object-[center_35%] opacity-75"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-arvenzo-dark/85 via-arvenzo-dark/40 to-transparent" />
-        <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 w-full py-20">
-          <div className="max-w-lg">
-            <p className="text-arvenzo-orange text-[11px] font-sans font-medium uppercase tracking-[0.2em] mb-4">
-              Comfortabel overal
-            </p>
-            <h2 className="font-heading font-black text-5xl sm:text-6xl text-arvenzo-cream leading-[0.95]">
+      {/* Row 1: Two columns — man sweatshirt + sustainability card */}
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        {/* Man with sweatshirt */}
+        <div className="relative overflow-hidden aspect-square group">
+          <Image
+            src="/images/man-sweatshirt.jpg"
+            alt="Man in Arvenzo sweatshirt"
+            fill
+            className="object-cover object-[center_35%] transition-transform duration-700 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-arvenzo-dark/75 via-arvenzo-dark/10 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-8">
+            <p className="text-arvenzo-orange text-[11px] uppercase tracking-widest font-sans mb-1">Comfortabel overal</p>
+            <h3 className="font-heading font-black text-3xl text-arvenzo-cream leading-tight mb-3">
               Van camping<br />
               <em className="not-italic text-arvenzo-orange">tot stad.</em>
-            </h2>
-            <p className="mt-5 text-arvenzo-cream/60 font-sans text-lg max-w-sm leading-relaxed">
-              Premium stof, uniek design. Gedragen door avonturiers die stijl niet vergeten.
-            </p>
+            </h3>
             {sweatshirt && (
               <Link
                 href={`/products/${sweatshirt.handle}`}
-                className="inline-flex items-center gap-2 mt-8 bg-arvenzo-cream text-arvenzo-ink font-heading font-bold px-7 py-3.5 rounded-full hover:bg-arvenzo-orange hover:text-arvenzo-cream transition-all text-sm tracking-wide"
+                className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/30 text-arvenzo-cream font-sans font-medium px-5 py-2.5 rounded-full text-sm hover:bg-white/25 transition-all"
               >
-                Shop sweatshirts — {formatPrice(sweatshirt.price)}
+                Ontdek — {formatPrice(sweatshirt.price)} →
               </Link>
             )}
+          </div>
+        </div>
+
+        {/* Sustainability card */}
+        <div className="aspect-square bg-arvenzo-dark flex flex-col items-center justify-center p-10 text-center">
+          <div className="text-5xl mb-6">🌱</div>
+          <p className="text-arvenzo-orange text-[11px] uppercase tracking-widest font-sans mb-3">Onze missie</p>
+          <h3 className="font-heading font-black text-4xl text-arvenzo-cream leading-tight mb-5">
+            1 boom &<br />1 kg CO₂
+          </h3>
+          <p className="font-sans text-arvenzo-cream/70 text-base leading-relaxed max-w-xs">
+            Voor elk besteld item planten wij één boom én halen we 1 kg CO₂ uit de lucht — voor een groenere toekomst.
+          </p>
+          <div className="mt-8 flex items-center gap-2 text-arvenzo-cream/40 text-xs font-sans uppercase tracking-widest">
+            <span>🌍</span>
+            <span>Samen voor een groenere wereld</span>
           </div>
         </div>
       </div>
