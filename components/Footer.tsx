@@ -8,7 +8,7 @@ import MerchantBadge from '@/components/MerchantBadge';
 
 function IconVisa() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Visa">
+    <svg width="58" height="38" viewBox="0 0 46 30" fill="none" aria-label="Visa">
       <rect width="46" height="30" rx="4" fill="white"/>
       <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#E0E0E0" strokeWidth=".7"/>
       {/* Visa blue bar bottom */}
@@ -23,7 +23,7 @@ function IconVisa() {
 
 function IconMastercard() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Mastercard">
+    <svg width="58" height="38" viewBox="0 0 46 30" fill="none" aria-label="Mastercard">
       <rect width="46" height="30" rx="4" fill="white"/>
       <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#E0E0E0" strokeWidth=".7"/>
       <circle cx="18" cy="15" r="9" fill="#EB001B"/>
@@ -36,7 +36,7 @@ function IconMastercard() {
 
 function IconBancontact() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Bancontact">
+    <svg width="58" height="38" viewBox="0 0 46 30" fill="none" aria-label="Bancontact">
       <rect width="46" height="30" rx="4" fill="#005498"/>
       {/* Yellow bottom */}
       <path d="M0 20h46v6a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4v-6z" fill="#FEC910"/>
@@ -50,7 +50,7 @@ function IconBancontact() {
 
 function IconMaestro() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Maestro">
+    <svg width="58" height="38" viewBox="0 0 46 30" fill="none" aria-label="Maestro">
       <rect width="46" height="30" rx="4" fill="white"/>
       <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#E0E0E0" strokeWidth=".7"/>
       <circle cx="19" cy="13" r="8" fill="#0099DF"/>
@@ -62,7 +62,7 @@ function IconMaestro() {
 
 function IconAmex() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="American Express">
+    <svg width="58" height="38" viewBox="0 0 46 30" fill="none" aria-label="American Express">
       <rect width="46" height="30" rx="4" fill="#2E77BC"/>
       <text x="23" y="19" textAnchor="middle" fontFamily="Arial Black,Arial,sans-serif" fontWeight="900" fontSize="9" fill="white" letterSpacing="1">AMEX</text>
     </svg>
@@ -71,7 +71,7 @@ function IconAmex() {
 
 function IconPayPal() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="PayPal">
+    <svg width="58" height="38" viewBox="0 0 46 30" fill="none" aria-label="PayPal">
       <rect width="46" height="30" rx="4" fill="white"/>
       <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#E0E0E0" strokeWidth=".7"/>
       <text x="10" y="20" fontFamily="Arial Black,sans-serif" fontWeight="900" fontStyle="italic" fontSize="13" fill="#003087">P</text>
@@ -83,7 +83,7 @@ function IconPayPal() {
 
 function IconUnionPay() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="UnionPay">
+    <svg width="58" height="38" viewBox="0 0 46 30" fill="none" aria-label="UnionPay">
       <rect width="46" height="30" rx="4" fill="#CC0000"/>
       <rect x="14" y="0" width="32" height="30" rx="4" fill="#CC0000"/>
       <rect x="0" y="0" width="18" height="30" rx="4" fill="#C41230"/>
@@ -95,7 +95,7 @@ function IconUnionPay() {
 
 function IconUSDC() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="USDC Crypto">
+    <svg width="58" height="38" viewBox="0 0 46 30" fill="none" aria-label="USDC Crypto">
       <rect width="46" height="30" rx="4" fill="#2775CA"/>
       <circle cx="18" cy="15" r="9" fill="#2775CA" stroke="white" strokeWidth="1.5"/>
       <text x="18" y="19" textAnchor="middle" fontFamily="Arial Black,sans-serif" fontWeight="900" fontSize="11" fill="white">$</text>
@@ -107,7 +107,7 @@ function IconUSDC() {
 
 function IconIdeal() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="iDEAL">
+    <svg width="58" height="38" viewBox="0 0 46 30" fill="none" aria-label="iDEAL">
       <rect width="46" height="30" rx="4" fill="white"/>
       <rect x=".5" y=".5" width="45" height="29" rx="3.5" stroke="#E0E0E0" strokeWidth=".7"/>
       <text x="23" y="20" textAnchor="middle" fontFamily="Arial Black,Arial,sans-serif" fontWeight="900" fontSize="12" fill="#C0006D">iDEAL</text>
@@ -117,7 +117,7 @@ function IconIdeal() {
 
 function IconKBC() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="KBC Direct Pay">
+    <svg width="58" height="38" viewBox="0 0 46 30" fill="none" aria-label="KBC Direct Pay">
       <rect width="46" height="30" rx="4" fill="#1B4284"/>
       <text x="23" y="14" textAnchor="middle" fontFamily="Arial Black,sans-serif" fontWeight="900" fontSize="10" fill="white" letterSpacing=".5">KBC</text>
       <text x="23" y="25" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="600" fontSize="6" fill="#7EC8E3" letterSpacing=".2">Direct Pay</text>
@@ -127,7 +127,7 @@ function IconKBC() {
 
 function IconBelfius() {
   return (
-    <svg width="46" height="30" viewBox="0 0 46 30" fill="none" aria-label="Belfius Direct Pay">
+    <svg width="58" height="38" viewBox="0 0 46 30" fill="none" aria-label="Belfius Direct Pay">
       <rect width="46" height="30" rx="4" fill="#CC0033"/>
       <text x="23" y="14" textAnchor="middle" fontFamily="Arial Black,sans-serif" fontWeight="900" fontSize="8" fill="white" letterSpacing=".3">Belfius</text>
       <text x="23" y="25" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="600" fontSize="6" fill="white" letterSpacing=".2">Direct Pay</text>
@@ -152,7 +152,6 @@ const PAYMENT_ICONS = [
 const SOCIALS = [
   { label: 'Instagram', href: 'https://instagram.com/arvenzo_eu' },
   { label: 'Facebook', href: 'https://facebook.com/arvenzo' },
-  { label: 'TikTok', href: 'https://tiktok.com/@arvenzo' },
 ];
 
 export default function Footer() {
