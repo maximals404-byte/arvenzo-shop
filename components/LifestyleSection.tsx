@@ -18,7 +18,7 @@ export default function LifestyleSection({ products }: { products: Product[] }) 
           src="/images/man-sweatshirt.jpg"
           alt="Man in Arvenzo sweatshirt"
           fill
-          className="object-cover object-top scale-[1.25] origin-top opacity-75"
+          className="object-cover object-top scale-[0.6] opacity-75"
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-arvenzo-dark/85 via-arvenzo-dark/40 to-transparent" />
