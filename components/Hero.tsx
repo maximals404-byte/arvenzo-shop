@@ -1,82 +1,64 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-arvenzo-dark">
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        <Image
-          src="https://cdn.shopify.com/s/files/1/0971/8543/1895/files/front-basic-unisex-hoodie-arctic-white-482-c070-2000x.png"
-          alt="Crescent Peak Hoodie"
-          fill
-          className="object-cover opacity-30"
-          priority
-        />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-arvenzo-dark via-arvenzo-dark/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-arvenzo-dark via-transparent to-arvenzo-dark/20" />
-      </div>
+    <section className="relative h-screen min-h-[700px] max-h-[1000px] flex items-end overflow-hidden bg-arvenzo-dark">
+      {/* Background */}
+      <Image
+        src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2400&q=85&auto=format&fit=crop"
+        alt="Mountain landscape at night"
+        fill
+        priority
+        className="object-cover opacity-60"
+        sizes="100vw"
+      />
+      {/* Gradients */}
+      <div className="absolute inset-0 bg-gradient-to-t from-arvenzo-dark via-arvenzo-dark/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-arvenzo-dark/60 via-transparent to-transparent" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
-        <div className="max-w-2xl">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-arvenzo-brown/20 border border-arvenzo-brown/40 text-arvenzo-orange text-xs font-medium px-4 py-2 rounded-full mb-8 animate-fade-up">
-            <span className="w-1.5 h-1.5 rounded-full bg-arvenzo-orange animate-pulse" />
-            Limited Edition Collectie
-          </div>
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 pb-16 sm:pb-24">
+        {/* Tag */}
+        <div className="inline-flex items-center gap-2 bg-arvenzo-orange/20 border border-arvenzo-orange/40 text-arvenzo-orange text-[11px] font-sans font-medium tracking-widest uppercase px-4 py-2 rounded-full mb-6">
+          <span className="w-1.5 h-1.5 rounded-full bg-arvenzo-orange animate-pulse" />
+          Nieuw — Crescent Peak & Lunar Horizon
+        </div>
 
-          {/* Heading */}
-          <h1 className="font-heading font-bold text-5xl sm:text-6xl lg:text-7xl text-arvenzo-cream leading-[1.05] animate-fade-up">
-            Avontuur.
-            <br />
-            <span className="text-arvenzo-orange">Rust.</span>
-            <br />
-            Stijl.
-          </h1>
+        <h1 className="font-heading font-black text-[clamp(3.5rem,10vw,8rem)] text-arvenzo-cream leading-[0.92] tracking-tight">
+          Draag het<br />
+          <em className="not-italic text-arvenzo-orange">avontuur.</em>
+        </h1>
 
-          <p className="mt-6 text-arvenzo-cream/70 text-lg sm:text-xl font-sans leading-relaxed max-w-lg animate-fade-up">
-            Ervaar de perfecte combinatie van comfort en design. Elke collectie vertelt een verhaal van de natuur.
-          </p>
+        <p className="mt-6 text-arvenzo-cream/60 font-sans text-lg sm:text-xl max-w-md leading-relaxed">
+          Premium streetwear voor wie de bergen voelt. Limited edition, gedrukt in Duitsland.
+        </p>
 
-          {/* CTAs */}
-          <div className="flex flex-wrap gap-4 mt-10 animate-fade-up">
-            <Link
-              href="/products"
-              className="inline-flex items-center gap-2 bg-arvenzo-orange text-arvenzo-dark font-heading font-bold px-8 py-4 rounded-xl hover:bg-arvenzo-orange-light active:scale-[0.97] transition-all text-base"
-            >
-              Ontdek de collectie
-              <ArrowRight size={18} />
-            </Link>
-            <Link
-              href="/products/crescent-peak-hoodie"
-              className="inline-flex items-center gap-2 border-2 border-arvenzo-cream/30 text-arvenzo-cream font-heading font-semibold px-8 py-4 rounded-xl hover:border-arvenzo-cream/60 hover:bg-arvenzo-cream/5 transition-all text-base"
-            >
-              Bekijk hoodie
-            </Link>
-          </div>
-
-          {/* Stats */}
-          <div className="flex flex-wrap gap-8 mt-14 animate-fade-up">
-            {[
-              { value: '4.9★', label: '500+ reviews' },
-              { value: '100%', label: 'Gedrukt in Duitsland' },
-              { value: 'Gratis', label: 'Verzending v.a. €50' },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <div className="font-heading font-bold text-xl text-arvenzo-cream">{stat.value}</div>
-                <div className="text-arvenzo-cream/50 text-sm font-sans mt-0.5">{stat.label}</div>
-              </div>
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-3 mt-10">
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 bg-arvenzo-cream text-arvenzo-ink font-heading font-bold px-8 py-4 rounded-full text-[15px] tracking-wide hover:bg-arvenzo-orange hover:text-arvenzo-cream transition-all active:scale-[0.97]"
+          >
+            Shop de collectie
+          </Link>
+          <Link
+            href="/products/crescent-peak-hoodie"
+            className="inline-flex items-center gap-2 border border-arvenzo-cream/25 text-arvenzo-cream font-sans font-medium px-8 py-4 rounded-full text-[15px] hover:border-arvenzo-cream/60 transition-all"
+          >
+            Bestseller →
+          </Link>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
-        <div className="w-px h-12 bg-gradient-to-b from-transparent to-arvenzo-cream/30" />
+      {/* Bottom product preview */}
+      <div className="absolute bottom-0 right-0 h-[85%] w-auto opacity-80 pointer-events-none hidden md:block">
+        <Image
+          src="https://cdn.shopify.com/s/files/1/0971/8543/1895/files/front-basic-unisex-hoodie-arctic-white-482-c070-2000x.png"
+          alt="Crescent Peak Hoodie"
+          width={600}
+          height={600}
+          className="h-full w-auto object-contain object-bottom drop-shadow-2xl"
+        />
       </div>
     </section>
   );

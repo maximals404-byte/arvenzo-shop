@@ -1,54 +1,59 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Inter:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --arvenzo-brown: #5D2B09;
-    --arvenzo-cream: #F7F1ED;
-    --arvenzo-orange: #D78650;
-  }
-
-  * {
-    box-sizing: border-box;
-  }
-
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
-    @apply bg-arvenzo-cream text-arvenzo-dark font-sans;
+    @apply bg-arvenzo-cream text-arvenzo-ink font-sans;
+    font-feature-settings: 'kern' 1, 'liga' 1;
   }
 
   ::selection {
-    @apply bg-arvenzo-orange/30 text-arvenzo-dark;
+    @apply bg-arvenzo-orange/30 text-arvenzo-ink;
   }
 }
 
 @layer utilities {
-  .bg-arvenzo-light {
-    background-color: #FAF7F4;
-  }
-}
+  .bg-arvenzo-light { background-color: #FAF7F4; }
+  .text-balance { text-wrap: balance; }
 
-/* Smooth scrollbar */
-@media (hover: hover) {
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb {
-    @apply bg-arvenzo-cream-dark rounded-full;
+    @apply bg-arvenzo-sand/50 rounded-full;
   }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-arvenzo-muted;
+
+  /* Marquee */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 35s linear infinite;
+  }
+  .marquee-track:hover { animation-play-state: paused; }
+
+  /* Prose overrides */
+  .product-description ul { @apply list-disc pl-5 space-y-1 mt-2; }
+  .product-description strong { @apply font-semibold text-arvenzo-ink; }
+
+  /* Glass */
+  .glass {
+    background: rgba(247, 241, 237, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .glass-dark {
+    background: rgba(13, 9, 6, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 }

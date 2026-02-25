@@ -1,189 +1,136 @@
-import {
-  PRODUCTS_QUERY,
-  PRODUCT_BY_HANDLE_QUERY,
-  CREATE_CART_MUTATION,
-  ADD_TO_CART_MUTATION,
-  REMOVE_FROM_CART_MUTATION,
-  UPDATE_CART_MUTATION,
-  GET_CART_QUERY,
-} from './queries';
-import type { Product, Cart, ShopifyProduct, ShopifyCart } from './types';
+import type { Product, ShopifyJSONProduct } from './types';
 
-const SHOPIFY_STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN;
-const SHOPIFY_ACCESS_TOKEN = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+const STORE_URL = 'https://www.arvenzo.be';
 
-async function shopifyFetch<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
-  if (!SHOPIFY_STORE_DOMAIN || !SHOPIFY_ACCESS_TOKEN) {
-    throw new Error('Shopify environment variables are not set. Check .env.local');
-  }
+// ─── Product Fetching (public JSON API — no auth needed) ──────────────────────
 
-  const endpoint = `https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`;
+function normalizeJSONProduct(p: ShopifyJSONProduct): Product {
+  const firstVariant = p.variants[0];
+  const compareAtRaw = firstVariant?.compare_at_price;
+  const compareAt = compareAtRaw && parseFloat(compareAtRaw) > 0 ? parseFloat(compareAtRaw) : null;
+  const price = parseFloat(firstVariant?.price ?? '0');
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Shopify-Storefront-Access-Token': SHOPIFY_ACCESS_TOKEN,
-    },
-    body: JSON.stringify({ query, variables }),
-    next: { revalidate: 60 },
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Shopify API error ${response.status}: ${errorText}`);
-  }
-
-  const json = await response.json();
-
-  if (json.errors) {
-    throw new Error(`GraphQL error: ${json.errors.map((e: { message: string }) => e.message).join(', ')}`);
-  }
-
-  return json.data as T;
-}
-
-function normalizeProduct(product: ShopifyProduct): Product {
   return {
-    id: product.id,
-    title: product.title,
-    handle: product.handle,
-    description: product.description,
-    descriptionHtml: product.descriptionHtml,
-    price: parseFloat(product.priceRange.minVariantPrice.amount),
-    compareAtPrice: product.compareAtPriceRange?.minVariantPrice?.amount
-      ? parseFloat(product.compareAtPriceRange.minVariantPrice.amount)
-      : null,
-    currency: product.priceRange.minVariantPrice.currencyCode,
-    images: product.images,
-    variants: product.variants,
-    options: product.options,
-    productType: product.productType,
-    vendor: product.vendor,
-    tags: product.tags,
-  };
-}
-
-function normalizeCart(cart: ShopifyCart): Cart {
-  return {
-    id: cart.id,
-    checkoutUrl: cart.checkoutUrl,
-    totalQuantity: cart.totalQuantity,
-    items: cart.lines.map((line) => ({
-      lineId: line.id,
-      variantId: line.merchandise.id,
-      quantity: line.quantity,
-      title: line.merchandise.product.title,
-      handle: line.merchandise.product.handle,
-      price: parseFloat(line.merchandise.price.amount),
-      currency: line.merchandise.price.currencyCode,
-      image: line.merchandise.product.images[0] ?? null,
-      selectedOptions: line.merchandise.selectedOptions,
+    id: String(p.id),
+    title: p.title,
+    handle: p.handle,
+    description: p.body_html.replace(/<[^>]*>/g, '').trim(),
+    descriptionHtml: p.body_html,
+    price,
+    compareAtPrice: compareAt && compareAt > price ? compareAt : null,
+    currency: 'EUR',
+    images: p.images.map((img) => ({
+      url: img.src,
+      altText: img.alt ?? p.title,
+      width: img.width ?? 2000,
+      height: img.height ?? 2000,
     })),
-    subtotal: parseFloat(cart.cost.subtotalAmount.amount),
-    total: parseFloat(cart.cost.totalAmount.amount),
-    currency: cart.cost.totalAmount.currencyCode,
+    options: p.options.map((o) => ({ name: o.name, values: o.values })),
+    variants: p.variants.map((v) => ({
+      id: String(v.id),
+      title: v.title,
+      price: { amount: v.price, currencyCode: 'EUR' },
+      compareAtPrice: v.compare_at_price
+        ? { amount: v.compare_at_price, currencyCode: 'EUR' }
+        : null,
+      availableForSale: v.available,
+      selectedOptions: p.options.map((o, i) => ({
+        name: o.name,
+        value: (v as Record<string, string>)[`option${i + 1}`] ?? '',
+      })),
+    })),
+    productType: p.product_type,
+    vendor: p.vendor,
+    tags: p.tags ?? [],
   };
 }
 
-// ─── Product Queries ──────────────────────────────────────────────────────────
-
-export async function getAllProducts(first = 20): Promise<Product[]> {
-  const data = await shopifyFetch<{
-    products: {
-      edges: Array<{ node: ShopifyProduct }>;
-    };
-  }>(PRODUCTS_QUERY, { first });
-
-  return data.products.edges.map(({ node }) => normalizeProduct(node));
+export async function getAllProducts(): Promise<Product[]> {
+  try {
+    const res = await fetch(`${STORE_URL}/products.json?limit=250`, {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data: { products: ShopifyJSONProduct[] } = await res.json();
+    return data.products.map(normalizeJSONProduct);
+  } catch (err) {
+    console.error('Failed to fetch products:', err);
+    return [];
+  }
 }
 
 export async function getProductByHandle(handle: string): Promise<Product | null> {
-  const data = await shopifyFetch<{ productByHandle: ShopifyProduct | null }>(
-    PRODUCT_BY_HANDLE_QUERY,
-    { handle }
-  );
-
-  if (!data.productByHandle) return null;
-  return normalizeProduct(data.productByHandle);
+  try {
+    const res = await fetch(`${STORE_URL}/products/${handle}.json`, {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return null;
+    const data: { product: ShopifyJSONProduct } = await res.json();
+    return normalizeJSONProduct(data.product);
+  } catch {
+    return null;
+  }
 }
 
-// ─── Cart Mutations ───────────────────────────────────────────────────────────
+// ─── Cart / Checkout URL builder ──────────────────────────────────────────────
 
-export async function createCart(
-  variantId: string,
-  quantity: number
-): Promise<Cart> {
-  const data = await shopifyFetch<{
-    cartCreate: { cart: ShopifyCart };
-  }>(CREATE_CART_MUTATION, {
-    lines: [{ merchandiseId: variantId, quantity }],
-  });
-
-  return normalizeCart(data.cartCreate.cart);
+export interface CartLineItem {
+  variantId: string; // numeric Shopify variant ID
+  quantity: number;
+  title: string;
+  handle: string;
+  price: number;
+  image: string | null;
+  selectedOptions: { name: string; value: string }[];
 }
 
-export async function addToCart(
-  cartId: string,
-  variantId: string,
-  quantity: number
-): Promise<Cart> {
-  const data = await shopifyFetch<{
-    cartLinesAdd: { cart: ShopifyCart };
-  }>(ADD_TO_CART_MUTATION, {
-    cartId,
-    lines: [{ merchandiseId: variantId, quantity }],
-  });
-
-  return normalizeCart(data.cartLinesAdd.cart);
-}
-
-export async function removeFromCart(cartId: string, lineId: string): Promise<Cart> {
-  const data = await shopifyFetch<{
-    cartLinesRemove: { cart: ShopifyCart };
-  }>(REMOVE_FROM_CART_MUTATION, {
-    cartId,
-    lineIds: [lineId],
-  });
-
-  return normalizeCart(data.cartLinesRemove.cart);
-}
-
-export async function updateCartItem(
-  cartId: string,
-  lineId: string,
-  quantity: number
-): Promise<Cart> {
-  const data = await shopifyFetch<{
-    cartLinesUpdate: { cart: ShopifyCart };
-  }>(UPDATE_CART_MUTATION, {
-    cartId,
-    lines: [{ id: lineId, quantity }],
-  });
-
-  return normalizeCart(data.cartLinesUpdate.cart);
-}
-
-export async function getCart(cartId: string): Promise<Cart | null> {
-  const data = await shopifyFetch<{ cart: ShopifyCart | null }>(
-    GET_CART_QUERY,
-    { cartId }
-  );
-
-  if (!data.cart) return null;
-  return normalizeCart(data.cart);
+export function buildCheckoutUrl(items: CartLineItem[]): string {
+  const parts = items.map((item) => `${item.variantId}:${item.quantity}`).join(',');
+  return `${STORE_URL}/cart/${parts}`;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 export function formatPrice(amount: number, currency = 'EUR'): string {
-  return new Intl.NumberFormat('nl-BE', {
-    style: 'currency',
-    currency,
-  }).format(amount);
+  return new Intl.NumberFormat('nl-BE', { style: 'currency', currency }).format(amount);
 }
 
 export function getDiscountPercentage(price: number, compareAtPrice: number | null): number | null {
   if (!compareAtPrice || compareAtPrice <= price) return null;
   return Math.round(((compareAtPrice - price) / compareAtPrice) * 100);
+}
+
+export function getCollectionName(handle: string): string {
+  const map: Record<string, string> = {
+    'crescent-peak': 'Crescent Peak',
+    'lunar-horizon': 'Lunar Horizon',
+    'rustic-retreat': 'Rustic Retreat',
+    'pathfinder-edition': 'Pathfinder Edition',
+    'natura-compass': 'Natura Compass',
+    'starry-compass': 'Starry Compass',
+    'mountain-nature': 'Mountain Nature',
+  };
+  for (const [key, name] of Object.entries(map)) {
+    if (handle.includes(key)) return name;
+  }
+  return handle;
+}
+
+// Group products by their collection (based on title prefix)
+export function groupProductsByCollection(products: Product[]): Record<string, Product[]> {
+  const groups: Record<string, Product[]> = {};
+  const collections = [
+    'Crescent Peak', 'Lunar Horizon', 'Rustic Retreat',
+    'Pathfinder Edition', 'Natura Compass', 'Starry Compass', 'Mountain nature',
+  ];
+
+  for (const product of products) {
+    const collection = collections.find((c) =>
+      product.title.toLowerCase().startsWith(c.toLowerCase())
+    ) ?? 'Overig';
+    if (!groups[collection]) groups[collection] = [];
+    groups[collection].push(product);
+  }
+
+  return groups;
 }

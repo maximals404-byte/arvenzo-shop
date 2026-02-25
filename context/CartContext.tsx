@@ -1,132 +1,89 @@
 'use client';
 
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  type ReactNode,
+  createContext, useContext, useEffect, useState,
+  useCallback, type ReactNode,
 } from 'react';
-import type { Cart } from '@/lib/types';
+import type { CartItem } from '@/lib/types';
+import { buildCheckoutUrl } from '@/lib/shopify';
 
 interface CartContextValue {
-  cart: Cart | null;
-  isLoading: boolean;
+  items: CartItem[];
   isOpen: boolean;
+  totalQuantity: number;
+  subtotal: number;
+  checkoutUrl: string;
   openCart: () => void;
   closeCart: () => void;
-  addItem: (variantId: string, quantity?: number) => Promise<void>;
-  removeItem: (lineId: string) => Promise<void>;
-  updateItem: (lineId: string, quantity: number) => Promise<void>;
-  totalQuantity: number;
+  addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void;
+  removeItem: (variantId: string) => void;
+  updateQuantity: (variantId: string, quantity: number) => void;
+  clearCart: () => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
+const STORAGE_KEY = 'arvenzo-cart';
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cart, setCart] = useState<Cart | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Load cart from localStorage on mount
+  // Load from localStorage
   useEffect(() => {
-    const savedCartId = localStorage.getItem('arvenzo-cart-id');
-    if (savedCartId) {
-      fetchCart(savedCartId);
-    }
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) setItems(JSON.parse(saved));
+    } catch { /* ignore */ }
   }, []);
 
-  async function fetchCart(cartId: string) {
-    try {
-      const res = await fetch(`/api/cart?cartId=${cartId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setCart(data.cart);
-      }
-    } catch {
-      // Cart not found, ignore
-      localStorage.removeItem('arvenzo-cart-id');
-    }
-  }
+  // Persist on change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  }, [items]);
 
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
-  const addItem = useCallback(async (variantId: string, quantity = 1) => {
-    setIsLoading(true);
-    try {
-      const cartId = cart?.id ?? localStorage.getItem('arvenzo-cart-id') ?? null;
-      const res = await fetch('/api/cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'add', cartId, variantId, quantity }),
-      });
-      const data = await res.json();
-      setCart(data.cart);
-      localStorage.setItem('arvenzo-cart-id', data.cart.id);
-      setIsOpen(true);
-    } catch (err) {
-      console.error('Add to cart failed:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [cart]);
+  const addItem = useCallback((newItem: Omit<CartItem, 'quantity'>, quantity = 1) => {
+    setItems((prev) => {
+      const existing = prev.find((i) => i.variantId === newItem.variantId);
+      if (existing) {
+        return prev.map((i) =>
+          i.variantId === newItem.variantId
+            ? { ...i, quantity: i.quantity + quantity }
+            : i
+        );
+      }
+      return [...prev, { ...newItem, quantity }];
+    });
+    setIsOpen(true);
+  }, []);
 
-  const removeItem = useCallback(async (lineId: string) => {
-    if (!cart) return;
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'remove', cartId: cart.id, lineId }),
-      });
-      const data = await res.json();
-      setCart(data.cart);
-    } catch (err) {
-      console.error('Remove from cart failed:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [cart]);
+  const removeItem = useCallback((variantId: string) => {
+    setItems((prev) => prev.filter((i) => i.variantId !== variantId));
+  }, []);
 
-  const updateItem = useCallback(async (lineId: string, quantity: number) => {
-    if (!cart) return;
+  const updateQuantity = useCallback((variantId: string, quantity: number) => {
     if (quantity <= 0) {
-      await removeItem(lineId);
-      return;
+      setItems((prev) => prev.filter((i) => i.variantId !== variantId));
+    } else {
+      setItems((prev) =>
+        prev.map((i) => (i.variantId === variantId ? { ...i, quantity } : i))
+      );
     }
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'update', cartId: cart.id, lineId, quantity }),
-      });
-      const data = await res.json();
-      setCart(data.cart);
-    } catch (err) {
-      console.error('Update cart failed:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [cart, removeItem]);
+  }, []);
+
+  const clearCart = useCallback(() => setItems([]), []);
+
+  const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0);
+  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const checkoutUrl = items.length > 0 ? buildCheckoutUrl(items) : 'https://www.arvenzo.be/cart';
 
   return (
-    <CartContext.Provider
-      value={{
-        cart,
-        isLoading,
-        isOpen,
-        openCart,
-        closeCart,
-        addItem,
-        removeItem,
-        updateItem,
-        totalQuantity: cart?.totalQuantity ?? 0,
-      }}
-    >
+    <CartContext.Provider value={{
+      items, isOpen, totalQuantity, subtotal, checkoutUrl,
+      openCart, closeCart, addItem, removeItem, updateQuantity, clearCart,
+    }}>
       {children}
     </CartContext.Provider>
   );

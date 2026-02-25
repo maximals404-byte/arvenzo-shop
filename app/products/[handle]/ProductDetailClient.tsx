@@ -5,17 +5,13 @@ import VariantSelector from '@/components/VariantSelector';
 import AddToCart from '@/components/AddToCart';
 import type { Product, ShopifyProductVariant } from '@/lib/types';
 
-interface ProductDetailClientProps {
-  product: Product;
-}
-
-export default function ProductDetailClient({ product }: ProductDetailClientProps) {
+export default function ProductDetailClient({ product }: { product: Product }) {
   const [selectedVariant, setSelectedVariant] = useState<ShopifyProductVariant | null>(
-    product.variants[0] ?? null
+    product.variants.find(v => v.availableForSale) ?? product.variants[0] ?? null
   );
 
-  const handleVariantChange = useCallback((variant: ShopifyProductVariant | null) => {
-    setSelectedVariant(variant);
+  const handleVariantChange = useCallback((v: ShopifyProductVariant | null) => {
+    setSelectedVariant(v);
   }, []);
 
   return (
@@ -25,7 +21,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         variants={product.variants}
         onVariantChange={handleVariantChange}
       />
-      <AddToCart variant={selectedVariant} />
+      <AddToCart variant={selectedVariant} product={product} />
     </div>
   );
 }

@@ -7,45 +7,28 @@ import CartDrawer from '@/components/CartDrawer';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Arvenzo – Avontuur & Stijl',
+    default: 'Arvenzo — Draag het avontuur.',
     template: '%s | Arvenzo',
   },
   description:
-    'Ontdek de Arvenzo collectie: premium hoodies, sweatshirts en accessoires met unieke berglandschap designs. Limited edition, gedrukt in Duitsland.',
-  keywords: ['arvenzo', 'hoodie', 'sweatshirt', 'limited edition', 'mountain', 'belgisch merk'],
-  authors: [{ name: 'Arvenzo', url: 'https://www.arvenzo.be' }],
+    'Premium limited edition streetwear met berglandschap designs. Hoodies, sweatshirts, shirts & mugs. Belgisch merk, gedrukt in Duitsland.',
+  keywords: ['arvenzo', 'hoodie', 'sweatshirt', 'limited edition', 'mountain', 'crescent peak'],
   openGraph: {
-    title: 'Arvenzo – Avontuur & Stijl',
-    description: 'Premium limited edition streetwear met berglandschap designs.',
+    title: 'Arvenzo — Draag het avontuur.',
+    description: 'Premium limited edition streetwear voor wie de bergen voelt.',
     url: 'https://www.arvenzo.be',
     siteName: 'Arvenzo',
     locale: 'nl_BE',
     type: 'website',
-    images: [
-      {
-        url: 'https://cdn.shopify.com/s/files/1/0971/8543/1895/files/front-basic-unisex-hoodie-arctic-white-482-c070-2000x.png',
-        width: 2000,
-        height: 2000,
-        alt: 'Arvenzo Crescent Peak Hoodie',
-      },
-    ],
+    images: [{
+      url: 'https://cdn.shopify.com/s/files/1/0971/8543/1895/files/front-basic-unisex-hoodie-arctic-white-482-c070-2000x.png',
+      width: 2000, height: 2000, alt: 'Arvenzo Crescent Peak Hoodie',
+    }],
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Arvenzo – Avontuur & Stijl',
-    description: 'Premium limited edition streetwear met berglandschap designs.',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="nl">
       <body>

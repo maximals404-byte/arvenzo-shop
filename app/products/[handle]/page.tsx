@@ -1,166 +1,160 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getProductByHandle, getAllProducts, formatPrice, getDiscountPercentage } from '@/lib/shopify';
-import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import ProductGallery from '@/components/ProductGallery';
 import ProductDetailClient from './ProductDetailClient';
+import ProductCard from '@/components/ProductCard';
 import type { Product } from '@/lib/types';
 
-interface PageProps {
-  params: { handle: string };
-}
-
-async function getProduct(handle: string): Promise<Product | null> {
-  if (
-    process.env.SHOPIFY_STORE_DOMAIN &&
-    process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN
-  ) {
-    try {
-      return await getProductByHandle(handle);
-    } catch {
-      // fallthrough to mock
-    }
-  }
-  return MOCK_PRODUCTS.find((p) => p.handle === handle) ?? null;
-}
+interface PageProps { params: { handle: string } }
 
 export async function generateStaticParams() {
-  let products: Product[] = MOCK_PRODUCTS;
-  if (
-    process.env.SHOPIFY_STORE_DOMAIN &&
-    process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN
-  ) {
-    try {
-      products = await getAllProducts(50);
-    } catch {
-      // fallthrough
-    }
-  }
-  return products.map((p) => ({ handle: p.handle }));
+  const products = await getAllProducts();
+  return products.map(p => ({ handle: p.handle }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const product = await getProduct(params.handle);
+  const product = await getProductByHandle(params.handle);
   if (!product) return {};
   return {
     title: product.title,
     description: product.description.slice(0, 160),
     openGraph: {
-      title: product.title,
-      description: product.description.slice(0, 160),
       images: product.images[0] ? [{ url: product.images[0].url }] : [],
     },
   };
 }
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export default async function ProductPage({ params }: PageProps) {
-  const product = await getProduct(params.handle);
+  const [product, allProducts] = await Promise.all([
+    getProductByHandle(params.handle),
+    getAllProducts(),
+  ]);
 
   if (!product) notFound();
 
   const discount = getDiscountPercentage(product.price, product.compareAtPrice);
+  const related = allProducts
+    .filter(p => p.productType === product.productType && p.handle !== product.handle)
+    .slice(0, 4);
 
   return (
-    <div className="pt-20 pb-20 bg-arvenzo-light min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="bg-arvenzo-light min-h-screen">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-[100px] pb-20">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm font-sans text-arvenzo-muted mb-10">
+        <nav className="flex items-center gap-2 text-xs font-sans text-arvenzo-muted mb-10">
           <a href="/" className="hover:text-arvenzo-brown transition-colors">Home</a>
           <span>/</span>
-          <a href="/products" className="hover:text-arvenzo-brown transition-colors">Collectie</a>
+          <a href="/products" className="hover:text-arvenzo-brown transition-colors">Shop</a>
           <span>/</span>
-          <span className="text-arvenzo-dark">{product.title}</span>
+          <span className="text-arvenzo-ink">{product.title}</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
           {/* Gallery */}
-          <div className="lg:sticky lg:top-24 lg:self-start">
+          <div className="lg:sticky lg:top-28 lg:self-start">
             <ProductGallery images={product.images} title={product.title} />
           </div>
 
-          {/* Product Info */}
+          {/* Info */}
           <div>
-            {/* Badges */}
             <div className="flex flex-wrap gap-2 mb-4">
               {discount && (
-                <span className="bg-arvenzo-brown text-arvenzo-cream text-xs font-bold px-3 py-1 rounded-full">
+                <span className="bg-arvenzo-brown text-arvenzo-cream text-[11px] font-heading font-bold px-3 py-1 rounded-full tracking-wide">
                   -{discount}% KORTING
                 </span>
               )}
-              {product.tags.includes('limited-edition') && (
-                <span className="bg-arvenzo-orange/20 text-arvenzo-brown text-xs font-semibold px-3 py-1 rounded-full border border-arvenzo-orange/30">
-                  Limited Edition
-                </span>
-              )}
+              <span className="bg-arvenzo-orange/15 text-arvenzo-brown text-[11px] font-semibold px-3 py-1 rounded-full border border-arvenzo-orange/20">
+                Limited Edition
+              </span>
             </div>
 
-            {/* Title & Price */}
-            <h1 className="font-heading font-bold text-3xl sm:text-4xl text-arvenzo-dark">
+            <h1 className="font-heading font-black text-3xl sm:text-4xl text-arvenzo-ink leading-tight">
               {product.title}
             </h1>
 
-            <div className="flex items-center gap-3 mt-4">
-              <span className="font-heading font-bold text-2xl text-arvenzo-dark">
-                {formatPrice(product.price, product.currency)}
+            {/* Price */}
+            <div className="flex items-baseline gap-3 mt-4">
+              <span className="font-heading font-black text-2xl text-arvenzo-ink">
+                {formatPrice(product.price)}
               </span>
               {product.compareAtPrice && product.compareAtPrice > product.price && (
                 <span className="font-sans text-lg text-arvenzo-muted line-through">
-                  {formatPrice(product.compareAtPrice, product.currency)}
+                  {formatPrice(product.compareAtPrice)}
                 </span>
               )}
             </div>
 
-            {/* Reviews stub */}
-            <div className="flex items-center gap-2 mt-3">
-              <div className="flex">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <svg key={i} className="w-4 h-4 text-arvenzo-orange" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            {/* Stars */}
+            <div className="flex items-center gap-2 mt-3 mb-7">
+              <div className="flex gap-0.5">
+                {Array.from({length: 5}).map((_, i) => (
+                  <svg key={i} className="w-3.5 h-3.5 text-arvenzo-orange" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                   </svg>
                 ))}
               </div>
-              <span className="text-sm text-arvenzo-muted font-sans">4.9 (47 reviews)</span>
+              <span className="text-xs text-arvenzo-muted font-sans">4.9 (47 reviews)</span>
             </div>
 
             <div className="border-t border-arvenzo-cream-dark my-6" />
 
-            {/* Interactive: variant selection + add to cart */}
+            {/* Variants + Add to cart */}
             <ProductDetailClient product={product} />
 
             <div className="border-t border-arvenzo-cream-dark my-6" />
 
-            {/* Description */}
-            <div>
-              <h3 className="font-heading font-semibold text-arvenzo-dark mb-3">Productomschrijving</h3>
-              <div
-                className="prose prose-sm max-w-none text-arvenzo-muted font-sans leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_strong]:text-arvenzo-dark [&_strong]:font-semibold"
-                dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
-              />
-            </div>
-
-            <div className="border-t border-arvenzo-cream-dark my-6" />
-
-            {/* Features */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Trust mini-bar */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
               {[
-                { icon: '🚚', title: 'Gratis verzending', desc: 'Vanaf €50' },
-                { icon: '🔄', title: '30 dagen retour', desc: 'Moeiteloos' },
-                { icon: '🇩🇪', title: 'Gedrukt in Duitsland', desc: 'Premium kwaliteit' },
-                { icon: '🔒', title: 'Veilig betalen', desc: 'SSL beveiligd' },
-              ].map((item) => (
-                <div key={item.title} className="flex items-start gap-3 p-3 rounded-xl bg-arvenzo-cream">
-                  <span className="text-xl">{item.icon}</span>
-                  <div>
-                    <div className="font-sans font-medium text-arvenzo-dark text-xs">{item.title}</div>
-                    <div className="font-sans text-xs text-arvenzo-muted">{item.desc}</div>
-                  </div>
+                { e: '🚚', t: 'Gratis v.a. €50' },
+                { e: '↩️', t: '30 dagen retour' },
+                { e: '🇩🇪', t: 'Gedrukt in DE' },
+              ].map(i => (
+                <div key={i.t} className="flex flex-col items-center text-center p-3 bg-arvenzo-cream rounded-xl gap-1.5">
+                  <span className="text-xl">{i.e}</span>
+                  <span className="text-[11px] font-sans text-arvenzo-muted leading-snug">{i.t}</span>
                 </div>
               ))}
             </div>
+
+            {/* Description */}
+            <details className="group" open>
+              <summary className="flex items-center justify-between cursor-pointer py-3 border-t border-arvenzo-cream-dark font-heading font-semibold text-arvenzo-ink text-sm select-none">
+                Productomschrijving
+                <span className="group-open:rotate-180 transition-transform text-arvenzo-muted">↓</span>
+              </summary>
+              <div
+                className="product-description pb-4 text-sm text-arvenzo-muted font-sans leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: product.descriptionHtml || `<p>${product.description}</p>` }}
+              />
+            </details>
+
+            <details className="group">
+              <summary className="flex items-center justify-between cursor-pointer py-3 border-t border-arvenzo-cream-dark font-heading font-semibold text-arvenzo-ink text-sm select-none">
+                Verzending & retouren
+                <span className="group-open:rotate-180 transition-transform text-arvenzo-muted">↓</span>
+              </summary>
+              <div className="pb-4 text-sm text-arvenzo-muted font-sans leading-relaxed space-y-2">
+                <p>• Gratis standaard verzending bij bestellingen vanaf €50</p>
+                <p>• Levertijd: 3-7 werkdagen binnen België en Nederland</p>
+                <p>• Retourneren binnen 30 dagen na ontvangst</p>
+              </div>
+            </details>
           </div>
         </div>
+
+        {/* Related */}
+        {related.length > 0 && (
+          <div className="mt-24">
+            <h2 className="font-heading font-black text-2xl text-arvenzo-ink mb-8">Gerelateerde producten</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+              {related.map(p => <ProductCard key={p.id} product={p} />)}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

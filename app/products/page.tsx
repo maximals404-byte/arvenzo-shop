@@ -1,101 +1,78 @@
 import { getAllProducts } from '@/lib/shopify';
-import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import ProductCard from '@/components/ProductCard';
 import type { Metadata } from 'next';
-import type { Product } from '@/lib/types';
 
 export const metadata: Metadata = {
   title: 'Collectie',
-  description: 'Ontdek de volledige Arvenzo collectie: hoodies, sweatshirts en accessoires.',
+  description: 'Ontdek alle 28 Arvenzo producten: hoodies, sweatshirts, shirts en mugs.',
 };
 
-export const revalidate = 60;
+export const revalidate = 300;
 
-interface PageProps {
-  searchParams: { type?: string; sort?: string };
+const TYPE_LABELS: Record<string, string> = {
+  Hoodies: 'Hoodies',
+  Sweatshirts: 'Sweatshirts',
+  'Unisex-Shirts': 'Shirts',
+  'Trinkgefäße': 'Mugs',
+};
+
+interface Props {
+  searchParams: { type?: string; collection?: string };
 }
 
-export default async function ProductsPage({ searchParams }: PageProps) {
-  let allProducts: Product[] = MOCK_PRODUCTS;
+export default async function ProductsPage({ searchParams }: Props) {
+  const allProducts = await getAllProducts();
 
-  if (
-    process.env.SHOPIFY_STORE_DOMAIN &&
-    process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN
-  ) {
-    try {
-      allProducts = await getAllProducts(50);
-    } catch (err) {
-      console.warn('Using mock data:', err);
-    }
-  }
-
-  // Filter by type
   const typeFilter = searchParams.type;
-  const products = typeFilter
-    ? allProducts.filter((p) =>
-        p.productType.toLowerCase() === typeFilter.toLowerCase()
-      )
+  const filtered = typeFilter
+    ? allProducts.filter(p => p.productType === typeFilter)
     : allProducts;
 
-  const categories = Array.from(new Set(allProducts.map((p) => p.productType).filter(Boolean)));
+  const types = Array.from(new Set(allProducts.map(p => p.productType).filter(Boolean)));
 
   return (
-    <div className="pt-24 pb-20 min-h-screen bg-arvenzo-light">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Page header */}
-        <div className="py-12 text-center">
-          <h1 className="font-heading font-bold text-4xl sm:text-5xl text-arvenzo-dark">
-            {typeFilter ?? 'Onze Collectie'}
-          </h1>
-          <p className="mt-3 text-arvenzo-muted font-sans text-lg">
-            {products.length} {products.length === 1 ? 'product' : 'producten'}
+    <div className="min-h-screen bg-arvenzo-light">
+      {/* Header */}
+      <div className="bg-arvenzo-ink pt-[96px] pb-14 px-5 sm:px-8">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-arvenzo-orange text-[11px] font-sans font-medium uppercase tracking-[0.2em] mb-3">
+            {filtered.length} producten
           </p>
+          <h1 className="font-heading font-black text-5xl sm:text-6xl text-arvenzo-cream">
+            {typeFilter ? (TYPE_LABELS[typeFilter] ?? typeFilter) : 'Alle producten'}
+          </h1>
         </div>
+      </div>
 
-        {/* Category filters */}
-        <div className="flex flex-wrap gap-2 justify-center mb-10">
-          <a
-            href="/products"
-            className={`px-5 py-2 rounded-full border text-sm font-medium font-sans transition-all ${
-              !typeFilter
-                ? 'bg-arvenzo-brown text-arvenzo-cream border-arvenzo-brown'
-                : 'border-arvenzo-cream-dark text-arvenzo-dark hover:border-arvenzo-brown/50'
-            }`}
-          >
-            Alles
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 py-10">
+        {/* Filter tabs */}
+        <div className="flex flex-wrap gap-2 mb-10">
+          <a href="/products" className={`px-5 py-2 rounded-full border text-sm font-sans font-medium transition-all ${!typeFilter ? 'bg-arvenzo-ink text-arvenzo-cream border-arvenzo-ink' : 'border-arvenzo-cream-dark text-arvenzo-ink hover:border-arvenzo-ink/40'}`}>
+            Alles ({allProducts.length})
           </a>
-          {categories.map((cat) => (
+          {types.map(type => (
             <a
-              key={cat}
-              href={`/products?type=${encodeURIComponent(cat)}`}
-              className={`px-5 py-2 rounded-full border text-sm font-medium font-sans transition-all ${
-                typeFilter === cat
-                  ? 'bg-arvenzo-brown text-arvenzo-cream border-arvenzo-brown'
-                  : 'border-arvenzo-cream-dark text-arvenzo-dark hover:border-arvenzo-brown/50'
-              }`}
+              key={type}
+              href={`/products?type=${encodeURIComponent(type)}`}
+              className={`px-5 py-2 rounded-full border text-sm font-sans font-medium transition-all ${typeFilter === type ? 'bg-arvenzo-ink text-arvenzo-cream border-arvenzo-ink' : 'border-arvenzo-cream-dark text-arvenzo-ink hover:border-arvenzo-ink/40'}`}
             >
-              {cat}
+              {TYPE_LABELS[type] ?? type} ({allProducts.filter(p => p.productType === type).length})
             </a>
           ))}
         </div>
 
-        {/* Product grid */}
-        {products.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+        {/* Grid */}
+        {filtered.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {filtered.map(p => (
+              <ProductCard key={p.id} product={p} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-24">
-            <p className="font-heading font-semibold text-xl text-arvenzo-dark">
-              Geen producten gevonden
-            </p>
-            <a
-              href="/products"
-              className="mt-4 inline-block text-arvenzo-brown font-sans hover:text-arvenzo-orange transition-colors"
-            >
-              Bekijk alle producten
+          <div className="text-center py-32">
+            <p className="font-heading font-semibold text-2xl text-arvenzo-ink">Geen producten gevonden</p>
+            <a href="/products" className="mt-4 inline-block text-arvenzo-brown hover:text-arvenzo-orange transition-colors font-sans">
+              Bekijk alles →
             </a>
           </div>
         )}

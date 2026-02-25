@@ -1,33 +1,28 @@
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
-import { Minus, Plus, X, ArrowLeft, ShoppingBag, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Minus, Plus, X, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/shopify';
 
 export default function CartPage() {
-  const { cart, isLoading, removeItem, updateItem } = useCart();
+  const { items, removeItem, updateQuantity, subtotal, checkoutUrl, totalQuantity } = useCart();
 
-  if (!cart || cart.items.length === 0) {
+  const shipping = subtotal >= 50 ? 0 : 4.99;
+  const total = subtotal + shipping;
+
+  if (items.length === 0) {
     return (
-      <div className="pt-24 pb-20 min-h-screen bg-arvenzo-light flex items-center justify-center">
-        <div className="text-center px-4">
-          <div className="w-24 h-24 rounded-full bg-arvenzo-cream-dark flex items-center justify-center mx-auto mb-6">
-            <ShoppingBag size={40} className="text-arvenzo-muted" />
+      <div className="min-h-screen bg-arvenzo-light flex items-center justify-center pt-24">
+        <div className="text-center px-5">
+          <div className="w-20 h-20 rounded-full bg-arvenzo-cream-dark flex items-center justify-center mx-auto mb-5">
+            <ShoppingBag size={36} className="text-arvenzo-muted" strokeWidth={1.5} />
           </div>
-          <h1 className="font-heading font-bold text-3xl text-arvenzo-dark mb-3">
-            Je winkelwagen is leeg
-          </h1>
-          <p className="text-arvenzo-muted font-sans mb-8">
-            Voeg producten toe aan je winkelwagen om verder te gaan.
-          </p>
-          <Link
-            href="/products"
-            className="inline-flex items-center gap-2 bg-arvenzo-brown text-arvenzo-cream font-heading font-semibold px-8 py-4 rounded-xl hover:bg-arvenzo-brown-light transition-colors"
-          >
-            Bekijk collectie
-            <ArrowRight size={18} />
+          <h1 className="font-heading font-black text-3xl text-arvenzo-ink mb-2">Winkelwagen is leeg</h1>
+          <p className="text-arvenzo-muted font-sans mb-8">Voeg producten toe om verder te gaan.</p>
+          <Link href="/products" className="inline-flex bg-arvenzo-brown text-arvenzo-cream font-heading font-bold px-8 py-4 rounded-full hover:bg-arvenzo-brown-light transition-colors">
+            Bekijk collectie →
           </Link>
         </div>
       </div>
@@ -35,149 +30,82 @@ export default function CartPage() {
   }
 
   return (
-    <div className="pt-24 pb-20 min-h-screen bg-arvenzo-light">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex items-center gap-4 mb-10">
-          <Link
-            href="/products"
-            className="flex items-center gap-2 text-arvenzo-muted hover:text-arvenzo-dark transition-colors font-sans text-sm"
-          >
-            <ArrowLeft size={16} />
-            Verder winkelen
-          </Link>
-          <h1 className="font-heading font-bold text-3xl text-arvenzo-dark">
-            Winkelwagen ({cart.totalQuantity})
-          </h1>
-        </div>
+    <div className="min-h-screen bg-arvenzo-light pt-[96px] pb-20">
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
+        <h1 className="font-heading font-black text-4xl text-arvenzo-ink mb-10">
+          Winkelwagen <span className="text-arvenzo-muted font-normal text-2xl">({totalQuantity})</span>
+        </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* Cart items */}
+          {/* Items */}
           <div className="lg:col-span-2 space-y-4">
-            {cart.items.map((item) => (
-              <div
-                key={item.lineId}
-                className="flex gap-5 bg-arvenzo-cream rounded-2xl p-5 border border-arvenzo-cream-dark"
-              >
-                {/* Image */}
-                <Link href={`/products/${item.handle}`} className="flex-shrink-0">
-                  <div className="w-24 h-24 rounded-xl overflow-hidden bg-arvenzo-cream-dark">
-                    {item.image && (
-                      <Image
-                        src={item.image.url}
-                        alt={item.image.altText ?? item.title}
-                        width={96}
-                        height={96}
-                        className="w-full h-full object-contain p-1"
-                      />
-                    )}
-                  </div>
+            {items.map(item => (
+              <div key={item.variantId} className="flex gap-5 bg-arvenzo-cream rounded-2xl p-5 border border-arvenzo-cream-dark group">
+                <Link href={`/products/${item.handle}`} className="shrink-0 w-[90px] h-[90px] rounded-xl bg-[#F0EAE4] overflow-hidden">
+                  {item.image && <Image src={item.image} alt={item.title} width={90} height={90} className="w-full h-full object-contain p-1.5" />}
                 </Link>
-
-                {/* Details */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start justify-between gap-3">
                     <div>
-                      <Link href={`/products/${item.handle}`}>
-                        <h3 className="font-heading font-semibold text-arvenzo-dark hover:text-arvenzo-brown transition-colors">
-                          {item.title}
-                        </h3>
+                      <Link href={`/products/${item.handle}`} className="font-heading font-bold text-arvenzo-ink hover:text-arvenzo-brown transition-colors">
+                        {item.title}
                       </Link>
                       <p className="text-sm text-arvenzo-muted font-sans mt-0.5">
-                        {item.selectedOptions.map((o) => o.value).join(' · ')}
+                        {item.selectedOptions.map(o => o.value).join(' · ')}
                       </p>
                     </div>
-                    <button
-                      onClick={() => removeItem(item.lineId)}
-                      disabled={isLoading}
-                      className="p-1.5 text-arvenzo-muted hover:text-arvenzo-dark rounded-lg hover:bg-arvenzo-cream-dark transition-all"
-                      aria-label="Verwijderen"
-                    >
-                      <X size={16} />
+                    <button onClick={() => removeItem(item.variantId)} className="p-1.5 text-arvenzo-muted hover:text-arvenzo-ink rounded-lg hover:bg-arvenzo-cream-dark transition-all opacity-0 group-hover:opacity-100">
+                      <X size={15} />
                     </button>
                   </div>
-
                   <div className="flex items-center justify-between mt-4">
-                    {/* Quantity */}
-                    <div className="flex items-center gap-2 border border-arvenzo-cream-dark rounded-xl overflow-hidden">
-                      <button
-                        onClick={() => updateItem(item.lineId, item.quantity - 1)}
-                        disabled={isLoading}
-                        className="p-2.5 text-arvenzo-muted hover:text-arvenzo-dark hover:bg-arvenzo-cream-dark transition-all disabled:opacity-40"
-                      >
+                    <div className="flex items-center border border-arvenzo-cream-dark rounded-xl overflow-hidden">
+                      <button onClick={() => updateQuantity(item.variantId, item.quantity - 1)} className="p-2.5 text-arvenzo-muted hover:text-arvenzo-ink hover:bg-arvenzo-cream-dark transition-all">
                         <Minus size={14} />
                       </button>
-                      <span className="w-8 text-center font-medium text-arvenzo-dark text-sm">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() => updateItem(item.lineId, item.quantity + 1)}
-                        disabled={isLoading}
-                        className="p-2.5 text-arvenzo-muted hover:text-arvenzo-dark hover:bg-arvenzo-cream-dark transition-all disabled:opacity-40"
-                      >
+                      <span className="w-8 text-center font-medium text-arvenzo-ink text-sm">{item.quantity}</span>
+                      <button onClick={() => updateQuantity(item.variantId, item.quantity + 1)} className="p-2.5 text-arvenzo-muted hover:text-arvenzo-ink hover:bg-arvenzo-cream-dark transition-all">
                         <Plus size={14} />
                       </button>
                     </div>
-
-                    <span className="font-heading font-bold text-arvenzo-dark">
-                      {formatPrice(item.price * item.quantity, item.currency)}
-                    </span>
+                    <span className="font-heading font-bold text-arvenzo-ink">{formatPrice(item.price * item.quantity)}</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Order summary */}
+          {/* Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-arvenzo-cream rounded-2xl p-6 border border-arvenzo-cream-dark sticky top-28">
-              <h2 className="font-heading font-bold text-xl text-arvenzo-dark mb-5">
-                Bestellingsoverzicht
-              </h2>
-
-              <div className="space-y-3 mb-5">
-                <div className="flex justify-between text-sm font-sans">
+            <div className="bg-arvenzo-cream rounded-2xl p-6 border border-arvenzo-cream-dark sticky top-[104px]">
+              <h2 className="font-heading font-bold text-xl text-arvenzo-ink mb-5">Samenvatting</h2>
+              <div className="space-y-3 text-sm font-sans">
+                <div className="flex justify-between">
                   <span className="text-arvenzo-muted">Subtotaal</span>
-                  <span className="text-arvenzo-dark font-medium">
-                    {formatPrice(cart.subtotal, cart.currency)}
-                  </span>
+                  <span className="text-arvenzo-ink font-medium">{formatPrice(subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-sm font-sans">
+                <div className="flex justify-between">
                   <span className="text-arvenzo-muted">Verzending</span>
-                  <span className="text-green-600 font-medium">
-                    {cart.subtotal >= 50 ? 'Gratis' : formatPrice(4.99, cart.currency)}
+                  <span className={shipping === 0 ? 'text-green-600 font-medium' : 'text-arvenzo-ink font-medium'}>
+                    {shipping === 0 ? 'Gratis ✓' : formatPrice(shipping)}
                   </span>
                 </div>
-                {cart.subtotal < 50 && (
-                  <p className="text-xs text-arvenzo-muted bg-arvenzo-cream-dark rounded-lg px-3 py-2 font-sans">
-                    Voeg nog {formatPrice(50 - cart.subtotal, cart.currency)} toe voor gratis verzending
+                {shipping > 0 && (
+                  <p className="text-[11px] text-arvenzo-muted bg-arvenzo-cream-dark rounded-lg p-2.5">
+                    Voeg nog {formatPrice(50 - subtotal)} toe voor gratis verzending
                   </p>
                 )}
               </div>
-
-              <div className="border-t border-arvenzo-cream-dark pt-4 mb-5">
-                <div className="flex justify-between">
-                  <span className="font-heading font-bold text-arvenzo-dark">Totaal</span>
-                  <span className="font-heading font-bold text-xl text-arvenzo-dark">
-                    {formatPrice(cart.subtotal >= 50 ? cart.subtotal : cart.subtotal + 4.99, cart.currency)}
-                  </span>
-                </div>
-                <p className="text-xs text-arvenzo-muted mt-1 font-sans">Incl. BTW</p>
+              <div className="border-t border-arvenzo-cream-dark my-4 pt-4 flex justify-between">
+                <span className="font-heading font-bold text-arvenzo-ink">Totaal</span>
+                <span className="font-heading font-black text-xl text-arvenzo-ink">{formatPrice(total)}</span>
               </div>
-
-              <a
-                href={cart.checkoutUrl}
-                className="w-full flex items-center justify-center gap-2 bg-arvenzo-brown text-arvenzo-cream font-heading font-bold py-4 rounded-xl hover:bg-arvenzo-brown-light active:scale-[0.98] transition-all text-base"
-              >
-                Afrekenen
-                <ArrowRight size={18} />
+              <a href={checkoutUrl} className="w-full flex items-center justify-center bg-arvenzo-brown text-arvenzo-cream font-heading font-bold py-4 rounded-full hover:bg-arvenzo-brown-light active:scale-[0.98] transition-all text-[15px] tracking-wide">
+                Afrekenen →
               </a>
-
-              <div className="mt-4 flex items-center justify-center gap-3 text-arvenzo-muted/60">
-                <svg viewBox="0 0 24 24" className="w-8 h-5" fill="currentColor"><text x="0" y="12" fontSize="8">VISA</text></svg>
-                <svg viewBox="0 0 24 24" className="w-8 h-5" fill="currentColor"><text x="0" y="12" fontSize="6">Maestro</text></svg>
-                <svg viewBox="0 0 24 24" className="w-8 h-5" fill="currentColor"><text x="0" y="12" fontSize="5">Mastercard</text></svg>
-                <svg viewBox="0 0 24 24" className="w-8 h-5" fill="currentColor"><text x="0" y="12" fontSize="5">Bancontact</text></svg>
-              </div>
+              <Link href="/products" className="block text-center mt-3 text-sm text-arvenzo-muted hover:text-arvenzo-ink transition-colors font-sans">
+                Verder winkelen
+              </Link>
             </div>
           </div>
         </div>

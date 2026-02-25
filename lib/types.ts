@@ -1,3 +1,43 @@
+// ─── Shopify Public JSON API types ───────────────────────────────────────────
+
+export interface ShopifyJSONImage {
+  src: string;
+  alt?: string | null;
+  width?: number;
+  height?: number;
+}
+
+export interface ShopifyJSONVariant {
+  id: number;
+  title: string;
+  price: string;
+  compare_at_price: string | null;
+  available: boolean;
+  option1?: string;
+  option2?: string;
+  option3?: string;
+}
+
+export interface ShopifyJSONOption {
+  name: string;
+  values: string[];
+}
+
+export interface ShopifyJSONProduct {
+  id: number;
+  title: string;
+  handle: string;
+  body_html: string;
+  vendor: string;
+  product_type: string;
+  tags: string[];
+  images: ShopifyJSONImage[];
+  options: ShopifyJSONOption[];
+  variants: ShopifyJSONVariant[];
+}
+
+// ─── Internal UI types ────────────────────────────────────────────────────────
+
 export interface ShopifyImage {
   url: string;
   altText: string | null;
@@ -8,11 +48,6 @@ export interface ShopifyImage {
 export interface ShopifyMoney {
   amount: string;
   currencyCode: string;
-}
-
-export interface ShopifyProductOption {
-  name: string;
-  values: string[];
 }
 
 export interface ShopifySelectedOption {
@@ -30,56 +65,11 @@ export interface ShopifyProductVariant {
   image?: ShopifyImage;
 }
 
-export interface ShopifyProduct {
-  id: string;
-  title: string;
-  handle: string;
-  description: string;
-  descriptionHtml: string;
-  priceRange: {
-    minVariantPrice: ShopifyMoney;
-    maxVariantPrice: ShopifyMoney;
-  };
-  compareAtPriceRange: {
-    minVariantPrice: ShopifyMoney;
-  };
-  images: ShopifyImage[];
-  variants: ShopifyProductVariant[];
-  options: ShopifyProductOption[];
-  tags: string[];
-  productType: string;
-  vendor: string;
+export interface ShopifyProductOption {
+  name: string;
+  values: string[];
 }
 
-export interface ShopifyCartLine {
-  id: string;
-  quantity: number;
-  merchandise: {
-    id: string;
-    title: string;
-    selectedOptions: ShopifySelectedOption[];
-    product: {
-      id: string;
-      title: string;
-      handle: string;
-      images: ShopifyImage[];
-    };
-    price: ShopifyMoney;
-  };
-}
-
-export interface ShopifyCart {
-  id: string;
-  checkoutUrl: string;
-  totalQuantity: number;
-  lines: ShopifyCartLine[];
-  cost: {
-    subtotalAmount: ShopifyMoney;
-    totalAmount: ShopifyMoney;
-  };
-}
-
-// Simplified types for UI usage
 export interface Product {
   id: string;
   title: string;
@@ -97,24 +87,17 @@ export interface Product {
   tags: string[];
 }
 
+// ─── Cart types ───────────────────────────────────────────────────────────────
+
 export interface CartItem {
-  lineId: string;
   variantId: string;
   quantity: number;
   title: string;
   handle: string;
   price: number;
-  currency: string;
-  image: ShopifyImage | null;
+  image: string | null;
   selectedOptions: ShopifySelectedOption[];
 }
 
-export interface Cart {
-  id: string;
-  checkoutUrl: string;
-  totalQuantity: number;
-  items: CartItem[];
-  subtotal: number;
-  total: number;
-  currency: string;
-}
+// Legacy compat
+export type ShopifyProduct = Product;
