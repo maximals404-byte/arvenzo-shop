@@ -1,67 +1,82 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { decodeJwtPayload } from '@/lib/auth';
-import Link from 'next/link';
+import { customerAccountQuery, CUSTOMER_DETAILS_QUERY, type CustomerDetails } from '@/lib/customerAccount';
 
-export const metadata = { title: 'Mijn account' };
+export const metadata = { title: 'Mijn gegevens' };
 
-export default function AccountPage() {
+const COUNTRY_NAMES: Record<string, string> = {
+  BE: 'België', NL: 'Nederland', FR: 'Frankrijk', DE: 'Duitsland', GB: 'Verenigd Koninkrijk',
+  LU: 'Luxemburg', US: 'Verenigde Staten',
+};
+
+export default async function AccountPage() {
   const cookieStore = cookies();
-  const idToken = cookieStore.get('arvenzo_id_token')?.value;
+  const accessToken = cookieStore.get('arvenzo_access_token')?.value;
 
-  if (!idToken) {
-    redirect('/api/auth/login');
-  }
+  if (!accessToken) redirect('/api/auth/login');
 
-  let customer: { email: string; firstName: string; lastName: string } = {
-    email: '',
-    firstName: '',
-    lastName: '',
-  };
+  let customer: CustomerDetails | null = null;
 
   try {
-    const payload = decodeJwtPayload(idToken);
-    customer = {
-      email: (payload.email as string) ?? '',
-      firstName: (payload.given_name ?? payload.first_name ?? '') as string,
-      lastName: (payload.family_name ?? payload.last_name ?? '') as string,
-    };
-  } catch {
-    redirect('/api/auth/login');
+    const data = await customerAccountQuery<{ customer: CustomerDetails }>(
+      accessToken,
+      CUSTOMER_DETAILS_QUERY,
+    );
+    customer = data.customer;
+  } catch (e) {
+    console.error('Failed to fetch customer details:', e);
   }
 
-  const initials = [customer.firstName[0], customer.lastName[0]]
-    .filter(Boolean)
-    .join('')
-    .toUpperCase() || customer.email[0]?.toUpperCase() || '?';
+  if (!customer) {
+    return (
+      <div className="bg-white rounded-2xl p-6 text-center text-arvenzo-muted font-sans">
+        Kon gegevens niet laden. Probeer opnieuw.
+      </div>
+    );
+  }
 
-  const fullName = [customer.firstName, customer.lastName].filter(Boolean).join(' ') || customer.email;
+  const addr = customer.defaultAddress;
+  const fullName = [customer.firstName, customer.lastName].filter(Boolean).join(' ');
 
   return (
-    <main className="min-h-screen bg-arvenzo-cream pt-[100px] pb-20">
-      <div className="max-w-2xl mx-auto px-6">
-        {/* Avatar + naam */}
-        <div className="flex flex-col items-center gap-4 mb-10">
-          <div className="w-20 h-20 rounded-full bg-arvenzo-brown text-arvenzo-cream flex items-center justify-center text-2xl font-heading font-bold">
-            {initials}
-          </div>
-          <div className="text-center">
-            <h1 className="font-heading font-black text-3xl text-arvenzo-ink">{fullName}</h1>
-            <p className="text-arvenzo-muted font-sans mt-1">{customer.email}</p>
-          </div>
+    <div className="grid gap-4">
+      {/* Persoonlijke gegevens */}
+      <section className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-arvenzo-cream-dark">
+          <h2 className="font-heading font-bold text-lg text-arvenzo-ink">Persoonlijke gegevens</h2>
         </div>
+        <dl className="divide-y divide-arvenzo-cream-dark">
+          <Row label="Naam" value={fullName || '—'} />
+          <Row label="E-mailadres" value={customer.emailAddress?.emailAddress ?? '—'} />
+          <Row label="Telefoonnummer" value={customer.phoneNumber?.phoneNumber ?? '—'} />
+        </dl>
+      </section>
 
-        {/* Links */}
-        <div className="bg-white rounded-2xl shadow-sm divide-y divide-arvenzo-cream-dark">
-          <Link
-            href="/api/auth/logout"
-            className="flex items-center justify-between px-6 py-4 hover:bg-arvenzo-cream/40 transition-colors text-red-600"
-          >
-            <span className="font-sans">Uitloggen</span>
-            <span>→</span>
-          </Link>
+      {/* Standaard adres */}
+      <section className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-arvenzo-cream-dark">
+          <h2 className="font-heading font-bold text-lg text-arvenzo-ink">Standaard leveringsadres</h2>
         </div>
-      </div>
-    </main>
+        {addr ? (
+          <dl className="divide-y divide-arvenzo-cream-dark">
+            <Row label="Naam" value={[addr.firstName, addr.lastName].filter(Boolean).join(' ') || '—'} />
+            <Row label="Adres" value={[addr.address1, addr.address2].filter(Boolean).join(', ')} />
+            <Row label="Stad" value={`${addr.zip} ${addr.city}`} />
+            <Row label="Land" value={COUNTRY_NAMES[addr.countryCode] ?? addr.countryCode} />
+          </dl>
+        ) : (
+          <p className="px-6 py-4 text-sm text-arvenzo-muted font-sans">Geen adres opgeslagen.</p>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between px-6 py-3.5 gap-4">
+      <dt className="text-sm font-sans text-arvenzo-muted shrink-0 w-36">{label}</dt>
+      <dd className="text-sm font-sans text-arvenzo-ink text-right">{value}</dd>
+    </div>
   );
 }
