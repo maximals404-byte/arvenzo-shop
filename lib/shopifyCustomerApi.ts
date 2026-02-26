@@ -1,3 +1,29 @@
+export interface OrderShippingAddress {
+  firstName: string | null;
+  lastName: string | null;
+  address1: string | null;
+  address2: string | null;
+  city: string | null;
+  zip: string | null;
+  territoryCode: string | null;
+}
+
+const ORDER_ADDRESS_QUERY = `
+  query GetOrderAddress($id: ID!) {
+    order(id: $id) {
+      shippingAddress {
+        firstName
+        lastName
+        address1
+        address2
+        city
+        zip
+        territoryCode
+      }
+    }
+  }
+`;
+
 export interface CustomerAccountProfile {
   firstName: string | null;
   lastName: string | null;
@@ -87,6 +113,29 @@ export async function getCustomerAccountProfile(
     return json?.data?.customer ?? null;
   } catch (e) {
     console.error('[CustomerAccountAPI] fetch failed:', e);
+    return null;
+  }
+}
+
+export async function getOrderShippingAddress(
+  accessToken: string,
+  numericOrderId: string,
+): Promise<OrderShippingAddress | null> {
+  const endpoint = await resolveEndpoint();
+  if (!endpoint) return null;
+  const id = `gid://shopify/Order/${numericOrderId}`;
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { Authorization: accessToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: ORDER_ADDRESS_QUERY, variables: { id } }),
+      cache: 'no-store',
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    if (json.errors) return null;
+    return json?.data?.order?.shippingAddress ?? null;
+  } catch {
     return null;
   }
 }

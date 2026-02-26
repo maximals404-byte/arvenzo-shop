@@ -7,6 +7,7 @@ import {
   getCustomerByEmail, getOrderById, getProductImagesByIds,
   buildTrackingUrl, type DetailedOrder,
 } from '@/lib/shopifyAdmin';
+import { getOrderShippingAddress, type OrderShippingAddress } from '@/lib/shopifyCustomerApi';
 
 export const metadata = { title: 'Bestelling' };
 
@@ -65,7 +66,11 @@ export default async function OrderDetailPage({ params }: { params: { id: string
   const customer = await getCustomerByEmail(email).catch(() => null);
   if (!customer) redirect('/api/auth/login');
 
-  const order = await getOrderById(params.id, customer.id);
+  const accessToken = cookieStore.get('arvenzo_access_token')?.value;
+  const [order, caShippingAddress] = await Promise.all([
+    getOrderById(params.id, customer.id),
+    accessToken ? getOrderShippingAddress(accessToken, params.id) : Promise.resolve(null),
+  ]);
   if (!order) notFound();
 
   // Fetch product images
@@ -187,18 +192,28 @@ export default async function OrderDetailPage({ params }: { params: { id: string
       )}
 
       {/* Shipping address */}
-      {order.shipping_address && (
-        <div className="bg-white rounded-2xl shadow-sm px-6 py-4">
-          <h3 className="font-heading font-bold text-lg text-arvenzo-ink mb-3">Verzonden naar</h3>
-          <p className="text-sm font-sans text-arvenzo-ink leading-relaxed">
-            {[order.shipping_address.first_name, order.shipping_address.last_name].filter(Boolean).join(' ')}<br />
-            {order.shipping_address.address1}
-            {order.shipping_address.address2 && <>, {order.shipping_address.address2}</>}<br />
-            {order.shipping_address.zip} {order.shipping_address.city}<br />
-            {COUNTRY_NAMES[order.shipping_address.country_code] ?? order.shipping_address.country}
-          </p>
-        </div>
-      )}
+      {(() => {
+        const addr = caShippingAddress ?? (order.shipping_address ? {
+          firstName: order.shipping_address.first_name,
+          lastName: order.shipping_address.last_name,
+          address1: order.shipping_address.address1,
+          address2: order.shipping_address.address2,
+          city: order.shipping_address.city,
+          zip: order.shipping_address.zip,
+          territoryCode: order.shipping_address.country_code,
+        } : null);
+        return addr && (
+          <div className="bg-white rounded-2xl shadow-sm px-6 py-4">
+            <h3 className="font-heading font-bold text-lg text-arvenzo-ink mb-3">Verzonden naar</h3>
+            <p className="text-sm font-sans text-arvenzo-ink leading-relaxed">
+              {[addr.firstName, addr.lastName].filter(Boolean).join(' ')}<br />
+              {addr.address1}{addr.address2 && <>, {addr.address2}</>}<br />
+              {addr.zip} {addr.city}<br />
+              {COUNTRY_NAMES[addr.territoryCode ?? ''] ?? addr.territoryCode}
+            </p>
+          </div>
+        );
+      })()}
     </div>
   );
 }
