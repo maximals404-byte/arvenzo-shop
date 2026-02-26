@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ShoppingBag, Menu, X, User } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import clsx from 'clsx';
 
 const NAV = [
@@ -16,6 +17,7 @@ const NAV = [
 
 export default function Header() {
   const { totalQuantity, openCart } = useCart();
+  const { customer, isLoading: authLoading } = useAuth();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -75,15 +77,34 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-1">
-            <a
-              href="https://shopify.com/authentication/97185431895/oauth/authorize"
-              aria-label="Mijn account"
-              className={clsx('p-2.5 transition-colors', textColor,
-                effectivelyScrolled ? 'hover:text-arvenzo-brown' : 'hover:text-arvenzo-orange'
-              )}
-            >
-              <User size={21} strokeWidth={1.5} />
-            </a>
+            {authLoading ? (
+              <span className={clsx('p-2.5', textColor)}>
+                <User size={21} strokeWidth={1.5} />
+              </span>
+            ) : customer ? (
+              <Link
+                href="/account"
+                aria-label="Mijn account"
+                className={clsx('flex items-center gap-1.5 p-2.5 transition-colors', textColor,
+                  effectivelyScrolled ? 'hover:text-arvenzo-brown' : 'hover:text-arvenzo-orange'
+                )}
+              >
+                <User size={21} strokeWidth={1.5} />
+                <span className="hidden sm:inline text-[13px] font-sans font-medium">
+                  {customer.firstName || customer.email}
+                </span>
+              </Link>
+            ) : (
+              <a
+                href="/api/auth/login"
+                aria-label="Inloggen"
+                className={clsx('p-2.5 transition-colors', textColor,
+                  effectivelyScrolled ? 'hover:text-arvenzo-brown' : 'hover:text-arvenzo-orange'
+                )}
+              >
+                <User size={21} strokeWidth={1.5} />
+              </a>
+            )}
             <button onClick={openCart} aria-label="Winkelwagen"
               className={clsx('relative p-2.5 transition-colors', textColor)}
             >
@@ -116,6 +137,21 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
+          {!authLoading && (
+            customer ? (
+              <Link href="/account" onClick={() => setMobileOpen(false)}
+                className="font-heading font-bold text-4xl text-arvenzo-ink hover:text-arvenzo-brown transition-colors py-3 border-t border-arvenzo-cream-dark"
+              >
+                Mijn account
+              </Link>
+            ) : (
+              <a href="/api/auth/login"
+                className="font-heading font-bold text-4xl text-arvenzo-ink hover:text-arvenzo-brown transition-colors py-3 border-t border-arvenzo-cream-dark"
+              >
+                Inloggen
+              </a>
+            )
+          )}
         </nav>
         <div className="mt-auto px-8 pb-12 text-sm text-arvenzo-muted font-sans">
           Belgisch merk · Gedrukt in Europa
