@@ -10,7 +10,6 @@ export interface CustomerAccountProfile {
     address2: string | null;
     city: string | null;
     zip: string | null;
-    countryCode: string | null;
   } | null;
 }
 
@@ -28,7 +27,6 @@ const QUERY = `
         address2
         city
         zip
-        countryCode
       }
     }
   }

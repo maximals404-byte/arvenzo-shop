@@ -61,7 +61,7 @@ export default async function AccountPage() {
           city: profile?.defaultAddress?.city ?? '',
           zip: profile?.defaultAddress?.zip ?? '',
           country: '',
-          country_code: profile?.defaultAddress?.countryCode ?? adminCustomer?.default_address?.country_code ?? 'BE',
+          country_code: adminCustomer?.default_address?.country_code ?? 'BE',
           province: null,
           default: true,
         }
