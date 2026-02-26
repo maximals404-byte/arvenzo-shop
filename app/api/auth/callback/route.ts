@@ -50,7 +50,10 @@ export async function GET(req: NextRequest) {
     refresh_token?: string;
     id_token: string;
     expires_in: number;
+    [key: string]: unknown;
   };
+  console.log('[callback] token response keys:', Object.keys(tokens));
+  console.log('[callback] access_token prefix:', tokens.access_token?.slice(0, 12));
 
   // Validate nonce via jose (discover issuer from well-known config)
   try {
@@ -76,30 +79,6 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     console.error('Token validation failed:', e);
     return NextResponse.redirect(`${appUrl}/?error=invalid_token`);
-  }
-
-  // Exchange access_token for a Customer Account API token (shcat_ prefix)
-  let caToken: string | null = null;
-  try {
-    const caRes = await fetch(`${authDomain}/oauth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
-        client_id: clientId,
-        subject_token: tokens.access_token,
-        subject_token_type: 'urn:ietf:params:oauth:token-type:access_token',
-        requested_token_type: 'urn:shopify:params:oauth:token-type:customer-api-token',
-      }).toString(),
-    });
-    if (caRes.ok) {
-      const caData = await caRes.json() as { access_token?: string };
-      caToken = caData.access_token ?? null;
-    } else {
-      console.error('Customer API token exchange failed:', await caRes.text());
-    }
-  } catch (e) {
-    console.error('Customer API token exchange error:', e);
   }
 
   const response = NextResponse.redirect(`${appUrl}/account`);
@@ -133,13 +112,6 @@ export async function GET(req: NextRequest) {
     ...sessionCookieOpts,
     maxAge: 3600,
   });
-
-  if (caToken) {
-    response.cookies.set('arvenzo_ca_token', caToken, {
-      ...sessionCookieOpts,
-      maxAge: 3600,
-    });
-  }
 
   return response;
 }
