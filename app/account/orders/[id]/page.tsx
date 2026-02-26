@@ -37,6 +37,11 @@ const CARRIER_NAMES: Record<string, string> = {
   postnl: 'PostNL', bpost: 'bpost', dhl: 'DHL', asendia: 'Asendia',
 };
 
+const COUNTRY_NAMES: Record<string, string> = {
+  BE: 'België', NL: 'Nederland', LU: 'Luxemburg',
+  DE: 'Duitsland', FR: 'Frankrijk', GB: 'Verenigd Koninkrijk',
+};
+
 function carrierLabel(company: string | null): string {
   if (!company) return 'Onbekend';
   const key = company.toLowerCase();
@@ -190,7 +195,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
             {order.shipping_address.address1}
             {order.shipping_address.address2 && <>, {order.shipping_address.address2}</>}<br />
             {order.shipping_address.zip} {order.shipping_address.city}<br />
-            {order.shipping_address.country}
+            {COUNTRY_NAMES[order.shipping_address.country_code] ?? order.shipping_address.country}
           </p>
         </div>
       )}

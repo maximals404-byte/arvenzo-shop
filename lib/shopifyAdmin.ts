@@ -102,6 +102,7 @@ export interface DetailedOrder {
     city: string;
     zip: string;
     country: string;
+    country_code: string;
   } | null;
   fulfillments: OrderFulfillment[];
   customer: { id: number } | null;
