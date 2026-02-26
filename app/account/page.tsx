@@ -29,15 +29,15 @@ export default async function AccountPage() {
   const customerId = getCustomerIdFromToken(idToken);
   console.log('[account] email:', email, '| customerId from JWT:', customerId);
 
-  let customer = customerId
-    ? await getCustomerById(customerId)
-    : await getCustomerByEmail(email).catch(() => null);
-
-  // Shopify "Login with Shop" customers often have no email in Admin API response.
-  // Fill it in from the JWT so it shows correctly in the UI.
-  if (customer && !customer.email && email) {
-    customer = { ...customer, email };
+  // Always end up with a full /customers/{id}.json fetch.
+  // The search endpoint returns incomplete data for Login-with-Shop customers.
+  let resolvedId = customerId;
+  if (!resolvedId) {
+    const found = await getCustomerByEmail(email).catch(() => null);
+    resolvedId = found?.id ?? null;
   }
+
+  const customer = resolvedId ? await getCustomerById(resolvedId) : null;
 
   console.log('[account] customer:', JSON.stringify(customer));
 
