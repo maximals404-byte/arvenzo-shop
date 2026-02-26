@@ -53,16 +53,6 @@ export default function AccountPage() {
 
         {/* Links */}
         <div className="bg-white rounded-2xl shadow-sm divide-y divide-arvenzo-cream-dark">
-          <a
-            href="https://arvenzo.myshopify.com/account/orders"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between px-6 py-4 hover:bg-arvenzo-cream/40 transition-colors"
-          >
-            <span className="font-sans text-arvenzo-ink">Mijn bestellingen</span>
-            <span className="text-arvenzo-muted">→</span>
-          </a>
-
           <Link
             href="/api/auth/logout"
             className="flex items-center justify-between px-6 py-4 hover:bg-arvenzo-cream/40 transition-colors text-red-600"
