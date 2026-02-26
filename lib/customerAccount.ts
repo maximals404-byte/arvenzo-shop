@@ -1,4 +1,4 @@
-const ENDPOINT = `${process.env.SHOPIFY_AUTH_DOMAIN}/graphql`;
+const ENDPOINT = `${process.env.SHOPIFY_AUTH_DOMAIN}/account/customer/api/2024-07/graphql`;
 
 export async function customerAccountQuery<T>(
   accessToken: string,
