@@ -1,6 +1,6 @@
 import type { Product, ShopifyJSONProduct } from './types';
 
-const STORE_URL = 'https://www.arvenzo.be';
+const STORE_URL = '2bpbqi-n3.myshopify.com';
 
 // ─── Product Fetching (public JSON API — no auth needed) ──────────────────────
 
