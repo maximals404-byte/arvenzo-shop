@@ -122,7 +122,7 @@ export async function getCustomerById(customerId: number): Promise<AdminCustomer
 
 export async function getCustomerByEmail(email: string): Promise<AdminCustomer | null> {
   const data = await adminFetch(
-    `/customers/search.json?query=email:${encodeURIComponent(email)}&limit=1&fields=id,first_name,last_name,email,phone,default_address,addresses`,
+    `/customers/search.json?query=email:${encodeURIComponent(email)}&limit=1`,
   );
   return data.customers?.[0] ?? null;
 }

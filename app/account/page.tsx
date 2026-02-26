@@ -21,9 +21,13 @@ export default async function AccountPage() {
 
   // Prefer direct ID lookup from JWT sub claim; fall back to email search
   const customerId = getCustomerIdFromToken(idToken);
+  console.log('[account] email:', email, '| customerId from JWT:', customerId);
+
   const customer = customerId
     ? await getCustomerById(customerId)
     : await getCustomerByEmail(email).catch(() => null);
+
+  console.log('[account] customer:', JSON.stringify(customer));
 
   if (!customer) {
     return (
