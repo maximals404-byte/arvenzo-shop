@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 
+export const dynamic = 'force-dynamic';
+
 const JWKS_URL = process.env.SHOPIFY_AUTH_DOMAIN + '/oauth/token_keys';
 
 export async function GET(req: NextRequest) {

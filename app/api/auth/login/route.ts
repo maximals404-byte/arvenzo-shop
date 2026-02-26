@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { generateRandomString, generateCodeChallenge } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const clientId = process.env.SHOPIFY_CLIENT_ID!;
   const authDomain = process.env.SHOPIFY_AUTH_DOMAIN!;

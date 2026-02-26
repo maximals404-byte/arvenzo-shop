@@ -48,7 +48,7 @@ function normalizeJSONProduct(p: ShopifyJSONProduct): Product {
 export async function getAllProducts(): Promise<Product[]> {
   try {
     const res = await fetch(`${STORE_URL}/products.json?limit=250`, {
-      next: { revalidate: 300 },
+      cache: 'no-store',
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data: { products: ShopifyJSONProduct[] } = await res.json();
