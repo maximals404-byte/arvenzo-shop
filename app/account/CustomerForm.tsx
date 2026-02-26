@@ -130,7 +130,7 @@ export function AddressForm({ customer }: { customer: AdminCustomer }) {
 
   const addr = customer.default_address;
   const countryLabel = COUNTRIES.find((c) => c.code === addr?.country_code)?.label ?? addr?.country ?? '—';
-  const cityLine = addr ? `${addr.zip} ${addr.city}` : '—';
+  const cityLine = addr ? [addr.zip, addr.city].filter(Boolean).join(' ') || '—' : '—';
   const addrLine = [addr?.address1, addr?.address2].filter(Boolean).join(', ') || '—';
 
   return (

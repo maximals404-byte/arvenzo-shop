@@ -19,13 +19,25 @@ export default async function AccountPage() {
     redirect('/api/auth/login');
   }
 
+  // Log JWT payload to diagnose sub claim format
+  try {
+    const raw = decodeJwtPayload(idToken);
+    console.log('[account] JWT payload:', JSON.stringify({ sub: raw.sub, email: raw.email }));
+  } catch { /* ignore */ }
+
   // Prefer direct ID lookup from JWT sub claim; fall back to email search
   const customerId = getCustomerIdFromToken(idToken);
   console.log('[account] email:', email, '| customerId from JWT:', customerId);
 
-  const customer = customerId
+  let customer = customerId
     ? await getCustomerById(customerId)
     : await getCustomerByEmail(email).catch(() => null);
+
+  // Shopify "Login with Shop" customers often have no email in Admin API response.
+  // Fill it in from the JWT so it shows correctly in the UI.
+  if (customer && !customer.email && email) {
+    customer = { ...customer, email };
+  }
 
   console.log('[account] customer:', JSON.stringify(customer));
 
