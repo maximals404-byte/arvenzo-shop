@@ -34,10 +34,34 @@ const QUERY = `
   }
 `;
 
+// Discover the GraphQL endpoint from Shopify's well-known config
+let cachedEndpoint: string | null = null;
+
+async function resolveEndpoint(): Promise<string | null> {
+  if (cachedEndpoint) return cachedEndpoint;
+  try {
+    const res = await fetch(
+      `https://${process.env.SHOPIFY_STORE_DOMAIN}/.well-known/customer-account-api`,
+      { cache: 'force-cache' },
+    );
+    if (!res.ok) return null;
+    const data = await res.json() as { graphql_api?: string };
+    cachedEndpoint = data.graphql_api ?? null;
+    console.log('[CustomerAccountAPI] discovered endpoint:', cachedEndpoint);
+    return cachedEndpoint;
+  } catch {
+    return null;
+  }
+}
+
 export async function getCustomerAccountProfile(
   accessToken: string,
 ): Promise<CustomerAccountProfile | null> {
-  const endpoint = `https://${process.env.SHOPIFY_STORE_DOMAIN}/customer/api/2024-07/graphql`;
+  const endpoint = await resolveEndpoint();
+  if (!endpoint) {
+    console.error('[CustomerAccountAPI] Could not discover endpoint');
+    return null;
+  }
 
   try {
     const res = await fetch(endpoint, {
