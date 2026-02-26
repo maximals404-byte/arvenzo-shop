@@ -5,6 +5,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
+import CookieBanner from '@/components/CookieBanner';
 import { Analytics } from '@vercel/analytics/next';
 import Script from 'next/script';
 
@@ -41,17 +42,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main>{children}</main>
             <Footer />
             <CartDrawer />
+            <CookieBanner />
           </CartProvider>
         </AuthProvider>
         <Analytics />
+        <Script id="consent-default" strategy="beforeInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            var consent = null;
+            try { consent = localStorage.getItem('arvenzo_consent'); } catch(e) {}
+            gtag('consent', 'default', {
+              analytics_storage: consent === 'granted' ? 'granted' : 'denied',
+              ad_storage: consent === 'granted' ? 'granted' : 'denied',
+              ad_user_data: consent === 'granted' ? 'granted' : 'denied',
+              ad_personalization: consent === 'granted' ? 'granted' : 'denied',
+              wait_for_update: 500,
+            });
+          `}
+        </Script>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-6ZCTDJ7PLC"
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'G-6ZCTDJ7PLC');
           `}
