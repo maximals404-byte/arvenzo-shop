@@ -14,7 +14,7 @@ export function AccountNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex gap-0 mb-6 border-b border-arvenzo-cream-dark overflow-x-auto">
+    <nav className="flex gap-0 mb-6 border-b border-arvenzo-cream-dark">
       {TABS.map((tab) => {
         const isActive = tab.exact
           ? pathname === tab.href
