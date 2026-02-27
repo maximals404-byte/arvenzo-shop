@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
 
 declare global {
   function gtag(...args: unknown[]): void;
 }
 
 export default function CookieBanner() {
+  const { t } = useLanguage();
   const [consent, setConsent] = useState<'granted' | 'denied' | null>(null);
 
   useEffect(() => {
@@ -45,9 +47,9 @@ export default function CookieBanner() {
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-arvenzo-ink text-arvenzo-cream px-4 py-4 shadow-lg">
       <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <p className="text-sm leading-relaxed">
-          Wij gebruiken cookies voor analytische doeleinden. Meer info in ons{' '}
+          {t('cookie.text')}{' '}
           <Link href="/privacy" className="underline hover:text-arvenzo-orange transition-colors">
-            Privacybeleid
+            {t('cookie.privacy')}
           </Link>
           .
         </p>
@@ -56,13 +58,13 @@ export default function CookieBanner() {
             onClick={handleDecline}
             className="px-4 py-2 text-sm border border-arvenzo-cream rounded hover:bg-arvenzo-cream hover:text-arvenzo-ink transition-colors"
           >
-            Weigeren
+            {t('cookie.decline')}
           </button>
           <button
             onClick={handleAccept}
             className="px-4 py-2 text-sm bg-arvenzo-orange text-white rounded hover:opacity-90 transition-opacity"
           >
-            Accepteren
+            {t('cookie.accept')}
           </button>
         </div>
       </div>

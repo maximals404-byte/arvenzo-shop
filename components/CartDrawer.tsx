@@ -4,11 +4,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { formatPrice } from '@/lib/shopify';
 import CartCrossSell from './CartCrossSell';
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, subtotal, checkoutUrl, totalQuantity } = useCart();
+  const { t } = useLanguage();
+
+  const shippingNote = subtotal >= 50
+    ? t('cart.free_shipping')
+    : t('cart.towards_free', { amount: (50 - subtotal).toFixed(2) });
 
   return (
     <>
@@ -22,7 +28,7 @@ export default function CartDrawer() {
           <div className="flex items-center gap-2.5">
             <ShoppingBag size={18} className="text-arvenzo-brown" strokeWidth={1.5} />
             <span className="font-heading font-bold text-arvenzo-ink">
-              Winkelwagen {totalQuantity > 0 && <span className="text-arvenzo-muted font-normal">({totalQuantity})</span>}
+              {t('cart.title')} {totalQuantity > 0 && <span className="text-arvenzo-muted font-normal">({totalQuantity})</span>}
             </span>
           </div>
           <button onClick={closeCart} className="p-2 text-arvenzo-muted hover:text-arvenzo-ink rounded-full hover:bg-arvenzo-cream-dark transition-all">
@@ -40,12 +46,12 @@ export default function CartDrawer() {
                   <ShoppingBag size={24} className="text-arvenzo-muted" strokeWidth={1.5} />
                 </div>
                 <div>
-                  <p className="font-heading font-semibold text-arvenzo-ink">Winkelwagen is leeg</p>
-                  <p className="text-arvenzo-muted text-sm font-sans mt-0.5">Voeg producten toe om verder te gaan</p>
+                  <p className="font-heading font-semibold text-arvenzo-ink">{t('cart.empty')}</p>
+                  <p className="text-arvenzo-muted text-sm font-sans mt-0.5">{t('cart.empty_sub')}</p>
                 </div>
                 <Link href="/products" onClick={closeCart}
                   className="bg-arvenzo-brown text-arvenzo-cream font-heading font-semibold px-6 py-3 rounded-full text-sm hover:bg-arvenzo-brown-light transition-colors">
-                  Shop nu
+                  {t('cart.shop_now')}
                 </Link>
               </div>
             ) : (
@@ -106,19 +112,17 @@ export default function CartDrawer() {
         {items.length > 0 && (
           <div className="border-t border-arvenzo-cream-dark px-6 py-5 space-y-3.5">
             <div className="flex items-center justify-between">
-              <span className="font-sans text-sm text-arvenzo-muted">Subtotaal</span>
+              <span className="font-sans text-sm text-arvenzo-muted">{t('cart.subtotal')}</span>
               <span className="font-heading font-bold text-arvenzo-ink text-lg">{formatPrice(subtotal)}</span>
             </div>
-            <p className="text-[11px] text-arvenzo-muted font-sans">
-              {subtotal >= 50 ? '✓ Gratis verzending inbegrepen' : `+ €${(50 - subtotal).toFixed(2)} voor gratis verzending`}
-            </p>
+            <p className="text-[11px] text-arvenzo-muted font-sans">{shippingNote}</p>
             <a href={checkoutUrl}
               className="w-full flex items-center justify-center bg-arvenzo-brown text-arvenzo-cream font-heading font-bold py-4 rounded-full hover:bg-arvenzo-brown-light active:scale-[0.98] transition-all text-[15px] tracking-wide">
-              Afrekenen →
+              {t('cart.checkout')} →
             </a>
             <button onClick={closeCart}
               className="w-full text-center text-sm text-arvenzo-muted hover:text-arvenzo-ink transition-colors font-sans">
-              Verder winkelen
+              {t('cart.continue')}
             </button>
           </div>
         )}

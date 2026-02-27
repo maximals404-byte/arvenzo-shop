@@ -2,10 +2,13 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { LanguageProvider } from '@/context/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import CookieBanner from '@/components/CookieBanner';
+import LanguagePopup from '@/components/LanguagePopup';
+import { getLocale } from '@/lib/locale';
 import { Analytics } from '@vercel/analytics/next';
 import Script from 'next/script';
 
@@ -33,16 +36,20 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = getLocale();
   return (
-    <html lang="nl">
+    <html lang={locale}>
       <body>
         <AuthProvider>
           <CartProvider>
-            <Header />
-            <main>{children}</main>
-            <Footer />
-            <CartDrawer />
-            <CookieBanner />
+            <LanguageProvider initialLocale={locale}>
+              <Header />
+              <main>{children}</main>
+              <Footer />
+              <CartDrawer />
+              <CookieBanner />
+              <LanguagePopup />
+            </LanguageProvider>
           </CartProvider>
         </AuthProvider>
         <Analytics />

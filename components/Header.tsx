@@ -6,21 +6,23 @@ import { usePathname } from 'next/navigation';
 import { ShoppingBag, Menu, X, User } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
 import clsx from 'clsx';
-
-const NAV = [
-  { href: '/products', label: 'Shop' },
-  { href: '/about', label: 'Ons verhaal' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/contact', label: 'Contact' },
-];
 
 export default function Header() {
   const { totalQuantity, openCart } = useCart();
   const { customer, isLoading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const NAV = [
+    { href: '/products', label: t('nav.shop') },
+    { href: '/about',    label: t('nav.story') },
+    { href: '/faq',      label: t('nav.faq') },
+    { href: '/contact',  label: t('nav.contact') },
+  ];
 
   // Only homepage gets the transparent-hero treatment
   const isHome = pathname === '/';
@@ -44,7 +46,7 @@ export default function Header() {
     <>
       {/* Announcement bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-arvenzo-brown text-arvenzo-cream text-[11px] font-sans tracking-widest uppercase text-center py-2.5 px-4">
-        Gratis verzending v.a. €50 &nbsp;·&nbsp; Limited edition &nbsp;·&nbsp; Gedrukt in Europa
+        {t('announcement.text')}
       </div>
 
       {/* Main header */}
@@ -84,7 +86,7 @@ export default function Header() {
             ) : customer ? (
               <Link
                 href="/account"
-                aria-label="Mijn account"
+                aria-label={t('nav.account')}
                 className={clsx('flex items-center gap-1.5 p-2.5 transition-colors', textColor,
                   effectivelyScrolled ? 'hover:text-arvenzo-brown' : 'hover:text-arvenzo-orange'
                 )}
@@ -97,7 +99,7 @@ export default function Header() {
             ) : (
               <a
                 href="/api/auth/login"
-                aria-label="Inloggen"
+                aria-label={t('nav.login')}
                 className={clsx('p-2.5 transition-colors', textColor,
                   effectivelyScrolled ? 'hover:text-arvenzo-brown' : 'hover:text-arvenzo-orange'
                 )}
@@ -105,7 +107,7 @@ export default function Header() {
                 <User size={21} strokeWidth={1.5} />
               </a>
             )}
-            <button onClick={openCart} aria-label="Winkelwagen"
+            <button onClick={openCart} aria-label={t('cart.title')}
               className={clsx('relative p-2.5 transition-colors', textColor)}
             >
               <ShoppingBag size={21} strokeWidth={1.5} />
@@ -142,19 +144,19 @@ export default function Header() {
               <Link href="/account" onClick={() => setMobileOpen(false)}
                 className="font-heading font-bold text-4xl text-arvenzo-ink hover:text-arvenzo-brown transition-colors py-3 border-t border-arvenzo-cream-dark"
               >
-                Mijn account
+                {t('nav.account')}
               </Link>
             ) : (
               <a href="/api/auth/login"
                 className="font-heading font-bold text-4xl text-arvenzo-ink hover:text-arvenzo-brown transition-colors py-3 border-t border-arvenzo-cream-dark"
               >
-                Inloggen
+                {t('nav.login')}
               </a>
             )
           )}
         </nav>
         <div className="mt-auto px-8 pb-12 text-sm text-arvenzo-muted font-sans">
-          Belgisch merk · Gedrukt in Europa
+          {t('mobile.tagline')}
         </div>
       </div>
     </>
