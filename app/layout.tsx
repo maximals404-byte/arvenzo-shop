@@ -33,6 +33,7 @@ export const metadata: Metadata = {
     }],
   },
   robots: { index: true, follow: true },
+  twitter: { card: 'summary_large_image', site: '@arvenzo' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -52,6 +53,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </LanguageProvider>
           </CartProvider>
         </AuthProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'Arvenzo',
+            url: 'https://www.arvenzo.be',
+            logo: 'https://www.arvenzo.be/logo.png',
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: 'Pandhoevestraat 62',
+              addressLocality: 'Begijnendijk',
+              postalCode: '3130',
+              addressCountry: 'BE',
+            },
+            contactPoint: {
+              '@type': 'ContactPoint',
+              telephone: '+32456882518',
+              contactType: 'customer service',
+              email: 'support@arvenzo.eu',
+            },
+          }) }}
+        />
         <Analytics />
         <Script id="consent-default" strategy="beforeInteractive">
           {`

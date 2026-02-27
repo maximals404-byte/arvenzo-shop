@@ -19,11 +19,13 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const product = await getProductByHandle(params.handle);
   if (!product) return {};
+  const img = product.images[0];
   return {
     title: product.title,
     description: product.description.slice(0, 160),
+    alternates: { canonical: `https://www.arvenzo.be/products/${params.handle}` },
     openGraph: {
-      images: product.images[0] ? [{ url: product.images[0].url }] : [],
+      images: img ? [{ url: img.url, width: img.width ?? 2000, height: img.height ?? 2000, alt: img.altText ?? product.title }] : [],
     },
   };
 }
@@ -47,6 +49,47 @@ export default async function ProductPage({ params }: PageProps) {
   return (
     <div className="bg-arvenzo-light min-h-screen">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-[100px] pb-20">
+        {/* Structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.title,
+            description: product.description,
+            image: product.images.map(i => i.url),
+            brand: { '@type': 'Brand', name: 'Arvenzo' },
+            sku: product.variants[0]?.id,
+            offers: {
+              '@type': 'Offer',
+              priceCurrency: 'EUR',
+              price: product.price,
+              availability: 'https://schema.org/InStock',
+              url: `https://www.arvenzo.be/products/${product.handle}`,
+              seller: { '@type': 'Organization', name: 'Arvenzo' },
+            },
+            ...(reviewData.totalCount > 0 && {
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: reviewData.averageRating,
+                reviewCount: reviewData.totalCount,
+              },
+            }),
+          }) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.arvenzo.be' },
+              { '@type': 'ListItem', position: 2, name: 'Shop', item: 'https://www.arvenzo.be/products' },
+              { '@type': 'ListItem', position: 3, name: product.title, item: `https://www.arvenzo.be/products/${product.handle}` },
+            ],
+          }) }}
+        />
+
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs font-sans text-arvenzo-muted mb-10">
           <a href="/" className="hover:text-arvenzo-brown transition-colors">Home</a>

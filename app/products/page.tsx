@@ -6,6 +6,7 @@ import type { Product } from '@/lib/types';
 export const metadata: Metadata = {
   title: 'Collectie | Arvenzo',
   description: 'Ontdek alle Arvenzo producten: hoodies, sweatshirts, shirts en mugs.',
+  alternates: { canonical: 'https://www.arvenzo.be/products' },
 };
 
 export const revalidate = 300;
