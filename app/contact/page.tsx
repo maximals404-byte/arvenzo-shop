@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -8,6 +8,23 @@ export default function ContactPage() {
   const { t } = useLanguage();
   const [sent, setSent] = useState(false);
   const [form, setForm] = useState({ naam: '', email: '', onderwerp: '', bericht: '' });
+
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      if (event.data && event.data.type === 'MAXIMALS_ADD_TO_CART') {
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: event.data.variantId, quantity: event.data.quantity || 1 }),
+        })
+          .then(res => res.json())
+          .then(data => document.dispatchEvent(new CustomEvent('cart:updated', { detail: data })))
+          .catch(err => console.error('Failed to add to cart:', err));
+      }
+    }
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -122,6 +139,15 @@ export default function ContactPage() {
               </button>
             </form>
           )}
+        </div>
+
+        {/* Live chat */}
+        <div className="mt-16 flex justify-center">
+          <iframe
+            src="https://rivodesk.com/embed?shopId=198d22cb-fb0c-4b84-96db-1a6b2cdbc12d"
+            style={{ width: '50%', height: 600, border: 'none', borderRadius: 16 }}
+            title="Arvenzo Chat"
+          />
         </div>
       </div>
     </div>
