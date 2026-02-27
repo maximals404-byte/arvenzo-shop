@@ -124,7 +124,7 @@ export default function Footer() {
             <span className="block">KBO: 1027.570.389 · BTW: BE1027.570.389 · support@arvenzo.eu</span>
             <span className="block">
               Belgisch recht van toepassing · Bevoegde rechtbank: arrondissement Leuven ·{' '}
-              <Link href="/bedrijfsgegevens" className="hover:text-arvenzo-orange/60 transition-colors">Bedrijfsgegevens</Link>
+              <Link href="/bedrijfsgegevens" className="hover:text-arvenzo-orange/60 transition-colors">{tr('footer.link.company')}</Link>
               {' · '}
               <Link href="/privacy" className="hover:text-arvenzo-orange/60 transition-colors">{tr('footer.link.privacy')}</Link>
               {' · '}

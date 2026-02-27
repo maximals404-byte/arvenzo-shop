@@ -259,6 +259,17 @@ const translations: Record<string, Record<string, string>> = {
     es: 'Seguro via Shopify', it: 'Sicuro via Shopify', pt: 'Seguro via Shopify', pl: 'Bezpieczne via Shopify',
     sv: 'Säkert via Shopify', da: 'Sikkert via Shopify', no: 'Sikkert via Shopify', fi: 'Turvallinen Shopifyn kautta',
   },
+  // ─── Cart cross-sell ───────────────────────────────────────────────────────
+  'cart.cross_sell': {
+    nl: 'Klanten kochten ook', fr: 'Les clients ont aussi acheté', de: 'Kunden kauften auch', en: 'Customers also bought',
+    es: 'Los clientes también compraron', it: 'I clienti hanno acquistato anche', pt: 'Clientes também compraram', pl: 'Klienci kupili też',
+    sv: 'Kunder köpte också', da: 'Kunder køber også', no: 'Kunder kjøpte også', fi: 'Asiakkaat ostivat myös',
+  },
+  'cart.add': {
+    nl: 'toevoegen', fr: 'ajouter', de: 'hinzufügen', en: 'add',
+    es: 'añadir', it: 'aggiungere', pt: 'adicionar', pl: 'dodaj',
+    sv: 'lägg till', da: 'tilføj', no: 'legg til', fi: 'lisää',
+  },
   // ─── Cart ──────────────────────────────────────────────────────────────────
   'cart.title': {
     nl: 'Winkelwagen', fr: 'Panier', de: 'Warenkorb', en: 'Cart',

@@ -6,10 +6,12 @@ import { Plus, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { formatPrice } from '@/lib/shopify';
 import { useCart } from '@/context/CartContext';
+import { useLanguage } from '@/context/LanguageContext';
 import type { Product } from '@/lib/types';
 
 export default function CartCrossSell() {
   const { items, addItem } = useCart();
+  const { t } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [added, setAdded] = useState<string | null>(null);
 
@@ -48,7 +50,7 @@ export default function CartCrossSell() {
   return (
     <div className="px-6 py-4 border-t border-arvenzo-cream-dark">
       <p className="text-[11px] font-sans font-medium uppercase tracking-[0.18em] text-arvenzo-muted mb-3">
-        Klanten kochten ook
+        {t('cart.cross_sell')}
       </p>
       <div className="flex flex-col gap-2">
         {suggestions.map(p => (
@@ -71,7 +73,7 @@ export default function CartCrossSell() {
               className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95 ${
                 added === p.id ? 'bg-green-600 text-white' : 'bg-arvenzo-brown text-arvenzo-cream hover:bg-arvenzo-brown-light'
               }`}
-              aria-label={`${p.title} toevoegen`}
+              aria-label={`${p.title} ${t('cart.add')}`}
             >
               {added === p.id ? <Check size={13} /> : <Plus size={13} />}
             </button>
