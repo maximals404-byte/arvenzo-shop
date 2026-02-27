@@ -54,6 +54,7 @@ export default async function TrackPage() {
       return numbers.map((num, i) => ({
         orderName: order.name,
         orderId: order.id,
+        fulfillmentId: f.id,
         carrier: f.tracking_company,
         trackingNumber: num,
         trackingUrl: buildTrackingUrl(f.tracking_company, num, urls[i] ?? null),
@@ -103,14 +104,12 @@ export default async function TrackPage() {
                 <p className="text-xs font-sans text-arvenzo-muted uppercase tracking-wide mb-1">Trackingnummer</p>
                 <p className="text-sm font-sans font-mono text-arvenzo-ink">{s.trackingNumber}</p>
               </div>
-              <a
-                href={s.trackingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href={`/account/track/${s.orderId}/${s.fulfillmentId}`}
                 className="shrink-0 bg-arvenzo-brown text-arvenzo-cream font-sans font-semibold text-sm px-5 py-2.5 rounded-full hover:bg-arvenzo-ink transition-colors"
               >
-                Volg pakket →
-              </a>
+                Bekijk status →
+              </Link>
             </div>
           </div>
         );

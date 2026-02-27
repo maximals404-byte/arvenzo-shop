@@ -210,7 +210,30 @@ export async function upsertDefaultAddress(
   }
 }
 
+export interface FulfillmentEvent {
+  id: number;
+  status: string;
+  message: string | null;
+  happened_at: string;
+  city: string | null;
+  country: string | null;
+}
+
 /* ── Tracking ── */
+
+export async function getFulfillmentEvents(
+  orderId: number,
+  fulfillmentId: number,
+): Promise<FulfillmentEvent[]> {
+  try {
+    const data = await adminFetch(
+      `/orders/${orderId}/fulfillments/${fulfillmentId}/events.json`,
+    );
+    return data.fulfillment_events ?? [];
+  } catch {
+    return [];
+  }
+}
 
 export function buildTrackingUrl(
   company: string | null,
