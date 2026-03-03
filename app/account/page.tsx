@@ -44,25 +44,26 @@ export default async function AccountPage() {
   const adminCustomer = await getCustomerById(resolvedId);
   const addressId = adminCustomer?.default_address?.id;
 
-  // Build unified customer object for the form components
+  // Build unified customer object — Customer Account API is primary, Admin API is full fallback
+  const adminAddr = adminCustomer?.default_address;
   const customer: AdminCustomer = {
     id: resolvedId,
-    first_name: profile?.firstName ?? '',
-    last_name: profile?.lastName ?? '',
-    email: profile?.emailAddress?.emailAddress ?? email,
-    phone: profile?.phoneNumber?.phoneNumber ?? null,
-    default_address: (profile?.defaultAddress || addressId)
+    first_name: profile?.firstName || adminCustomer?.first_name || '',
+    last_name: profile?.lastName || adminCustomer?.last_name || '',
+    email: profile?.emailAddress?.emailAddress || adminCustomer?.email || email,
+    phone: profile?.phoneNumber?.phoneNumber || adminCustomer?.phone || null,
+    default_address: (profile?.defaultAddress || adminAddr)
       ? {
           id: addressId ?? 0,
-          first_name: profile?.defaultAddress?.firstName ?? profile?.firstName ?? '',
-          last_name: profile?.defaultAddress?.lastName ?? profile?.lastName ?? '',
-          address1: profile?.defaultAddress?.address1 ?? '',
-          address2: profile?.defaultAddress?.address2 ?? null,
-          city: profile?.defaultAddress?.city ?? '',
-          zip: profile?.defaultAddress?.zip ?? '',
-          country: '',
-          country_code: adminCustomer?.default_address?.country_code ?? 'BE',
-          province: null,
+          first_name: profile?.defaultAddress?.firstName || adminAddr?.first_name || profile?.firstName || adminCustomer?.first_name || '',
+          last_name: profile?.defaultAddress?.lastName || adminAddr?.last_name || profile?.lastName || adminCustomer?.last_name || '',
+          address1: profile?.defaultAddress?.address1 || adminAddr?.address1 || '',
+          address2: profile?.defaultAddress?.address2 ?? adminAddr?.address2 ?? null,
+          city: profile?.defaultAddress?.city || adminAddr?.city || '',
+          zip: profile?.defaultAddress?.zip || adminAddr?.zip || '',
+          country: adminAddr?.country || '',
+          country_code: adminAddr?.country_code || 'BE',
+          province: adminAddr?.province ?? null,
           default: true,
         }
       : null,

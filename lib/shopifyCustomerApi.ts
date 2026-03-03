@@ -58,6 +58,15 @@ const QUERY = `
   }
 `;
 
+// Derive fallback endpoint from SHOPIFY_AUTH_DOMAIN (e.g. https://shopify.com/authentication/97185431895)
+function getFallbackEndpoint(): string | null {
+  const authDomain = process.env.SHOPIFY_AUTH_DOMAIN;
+  if (!authDomain) return null;
+  const match = authDomain.match(/\/(\d+)$/);
+  if (!match) return null;
+  return `https://shopify.com/${match[1]}/account/customer/api/2024-07/graphql`;
+}
+
 // Discover the GraphQL endpoint from Shopify's well-known config
 let cachedEndpoint: string | null = null;
 
@@ -66,16 +75,26 @@ async function resolveEndpoint(): Promise<string | null> {
   try {
     const res = await fetch(
       `https://${process.env.SHOPIFY_STORE_DOMAIN}/.well-known/customer-account-api`,
-      { cache: 'force-cache' },
+      { next: { revalidate: 3600 } },
     );
-    if (!res.ok) return null;
-    const data = await res.json() as { graphql_api?: string };
-    cachedEndpoint = data.graphql_api ?? null;
-    console.log('[CustomerAccountAPI] discovered endpoint:', cachedEndpoint);
+    if (res.ok) {
+      const data = await res.json() as { graphql_api?: string };
+      if (data.graphql_api) {
+        cachedEndpoint = data.graphql_api;
+        return cachedEndpoint;
+      }
+    }
+  } catch { /* fall through */ }
+
+  // Fallback: derive from SHOPIFY_AUTH_DOMAIN
+  const fallback = getFallbackEndpoint();
+  if (fallback) {
+    cachedEndpoint = fallback;
     return cachedEndpoint;
-  } catch {
-    return null;
   }
+
+  console.error('[CustomerAccountAPI] Could not resolve endpoint');
+  return null;
 }
 
 export async function getCustomerAccountProfile(
