@@ -8,6 +8,22 @@ export default function Newsletter() {
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [done, setDone] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email) return;
+    setLoading(true);
+    try {
+      await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+    } catch { /* ignore — we still show success */ }
+    setLoading(false);
+    setDone(true);
+  }
 
   return (
     <section className="relative overflow-hidden bg-arvenzo-dark py-24">
@@ -35,7 +51,7 @@ export default function Newsletter() {
           </div>
         ) : (
           <form
-            onSubmit={(e) => { e.preventDefault(); if (email) setDone(true); }}
+            onSubmit={handleSubmit}
             className="mt-8 flex flex-col sm:flex-row gap-3"
           >
             <input
@@ -44,13 +60,15 @@ export default function Newsletter() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t('newsletter.placeholder')}
               required
-              className="flex-1 px-5 py-4 rounded-full bg-white/10 border border-white/20 text-arvenzo-cream placeholder:text-arvenzo-cream/30 font-sans text-sm focus:outline-none focus:border-arvenzo-orange transition-colors"
+              disabled={loading}
+              className="flex-1 px-5 py-4 rounded-full bg-white/10 border border-white/20 text-arvenzo-cream placeholder:text-arvenzo-cream/30 font-sans text-sm focus:outline-none focus:border-arvenzo-orange transition-colors disabled:opacity-50"
             />
             <button
               type="submit"
-              className="bg-arvenzo-orange text-arvenzo-dark font-heading font-bold px-8 py-4 rounded-full text-sm tracking-wide hover:bg-arvenzo-orange-light active:scale-[0.97] transition-all whitespace-nowrap"
+              disabled={loading}
+              className="bg-arvenzo-orange text-arvenzo-dark font-heading font-bold px-8 py-4 rounded-full text-sm tracking-wide hover:bg-arvenzo-orange-light active:scale-[0.97] transition-all whitespace-nowrap disabled:opacity-50"
             >
-              {t('newsletter.submit')}
+              {loading ? '...' : t('newsletter.submit')}
             </button>
           </form>
         )}

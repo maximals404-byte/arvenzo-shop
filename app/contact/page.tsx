@@ -7,6 +7,8 @@ import { useLanguage } from '@/context/LanguageContext';
 export default function ContactPage() {
   const { t } = useLanguage();
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [form, setForm] = useState({ naam: '', email: '', onderwerp: '', bericht: '' });
 
   useEffect(() => {
@@ -26,9 +28,22 @@ export default function ContactPage() {
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSent(true);
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error('Versturen mislukt');
+      setSent(true);
+    } catch {
+      setError('Er ging iets mis. Probeer het opnieuw of mail ons rechtstreeks.');
+    }
+    setLoading(false);
   }
 
   return (
@@ -150,11 +165,15 @@ export default function ContactPage() {
                     className="w-full px-4 py-3 rounded-xl border border-arvenzo-cream-dark bg-white text-arvenzo-ink text-sm font-sans placeholder:text-arvenzo-muted/50 focus:outline-none focus:border-arvenzo-brown transition-colors resize-none"
                   />
                 </div>
+                {error && (
+                  <p className="text-red-500 text-sm font-sans">{error}</p>
+                )}
                 <button
                   type="submit"
-                  className="w-full bg-arvenzo-brown text-arvenzo-cream font-heading font-bold py-3.5 rounded-full hover:bg-arvenzo-brown-light active:scale-[0.98] transition-all text-sm tracking-wide"
+                  disabled={loading}
+                  className="w-full bg-arvenzo-brown text-arvenzo-cream font-heading font-bold py-3.5 rounded-full hover:bg-arvenzo-brown-light active:scale-[0.98] transition-all text-sm tracking-wide disabled:opacity-50"
                 >
-                  {t('contact.form.submit')}
+                  {loading ? 'Versturen...' : t('contact.form.submit')}
                 </button>
               </form>
             )}

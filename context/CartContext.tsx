@@ -2,10 +2,38 @@
 
 import {
   createContext, useContext, useEffect, useState,
-  useCallback, type ReactNode,
+  useCallback, useRef, type ReactNode,
 } from 'react';
 import type { CartItem } from '@/lib/types';
-import { buildCheckoutUrl } from '@/lib/shopify';
+
+// ─── Shopify cart shapes ──────────────────────────────────────────────────────
+
+interface ShopifyCartLine {
+  id: string;
+  quantity: number;
+  merchandise: {
+    id: string;
+    title: string;
+    selectedOptions: { name: string; value: string }[];
+    price: { amount: string; currencyCode: string };
+    product: {
+      id: string;
+      title: string;
+      handle: string;
+      images: { edges: { node: { url: string; altText: string | null } }[] };
+    };
+  };
+}
+
+interface ShopifyCart {
+  id: string;
+  checkoutUrl: string;
+  totalQuantity: number;
+  cost: { subtotalAmount: { amount: string; currencyCode: string } };
+  lines: { edges: { node: ShopifyCartLine }[] };
+}
+
+// ─── Context value ────────────────────────────────────────────────────────────
 
 interface CartContextValue {
   items: CartItem[];
@@ -22,62 +50,134 @@ interface CartContextValue {
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
-const STORAGE_KEY = 'arvenzo-cart';
+const CART_ID_KEY = 'arvenzo-cart-id';
+const FALLBACK_CHECKOUT = 'https://2bpbqi-n3.myshopify.com/cart';
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function cartToItems(cart: ShopifyCart): CartItem[] {
+  return cart.lines.edges.map(({ node }) => ({
+    variantId: node.merchandise.id,
+    quantity: node.quantity,
+    title: node.merchandise.product.title,
+    handle: node.merchandise.product.handle,
+    price: parseFloat(node.merchandise.price.amount),
+    image: node.merchandise.product.images.edges[0]?.node.url ?? null,
+    selectedOptions: node.merchandise.selectedOptions,
+  }));
+}
+
+async function cartApiCall(body: Record<string, unknown>): Promise<ShopifyCart | null> {
+  try {
+    const res = await fetch('/api/cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.cart ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [cartId, setCartId] = useState<string | null>(null);
+  const [checkoutUrl, setCheckoutUrl] = useState(FALLBACK_CHECKOUT);
 
-  // Load from localStorage
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setItems(JSON.parse(saved));
-    } catch { /* ignore */ }
+  // variantId → Shopify line ID (needed for remove/update)
+  const lineIdMap = useRef<Map<string, string>>(new Map());
+
+  const syncCart = useCallback((cart: ShopifyCart) => {
+    setCartId(cart.id);
+    setCheckoutUrl(cart.checkoutUrl);
+    setItems(cartToItems(cart));
+    try { localStorage.setItem(CART_ID_KEY, cart.id); } catch { /* ignore */ }
+    lineIdMap.current = new Map(
+      cart.lines.edges.map(({ node }) => [node.merchandise.id, node.id])
+    );
   }, []);
 
-  // Persist on change
+  // Restore cart from Shopify on mount
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+    let storedId: string | null = null;
+    try { storedId = localStorage.getItem(CART_ID_KEY); } catch { /* ignore */ }
+    if (!storedId) return;
+
+    cartApiCall({ action: 'get', cartId: storedId }).then((cart) => {
+      if (cart) syncCart(cart);
+      else {
+        try { localStorage.removeItem(CART_ID_KEY); } catch { /* ignore */ }
+      }
+    });
+  }, [syncCart]);
 
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
-  const addItem = useCallback((newItem: Omit<CartItem, 'quantity'>, quantity = 1) => {
-    setItems((prev) => {
-      const existing = prev.find((i) => i.variantId === newItem.variantId);
-      if (existing) {
-        return prev.map((i) =>
-          i.variantId === newItem.variantId
-            ? { ...i, quantity: i.quantity + quantity }
-            : i
-        );
-      }
-      return [...prev, { ...newItem, quantity }];
-    });
-    setIsOpen(true);
-  }, []);
+  const addItem = useCallback(async (newItem: Omit<CartItem, 'quantity'>, quantity = 1) => {
+    const line = { merchandiseId: newItem.variantId, quantity };
+    const cart = cartId
+      ? await cartApiCall({ action: 'add', cartId, lines: [line] })
+      : await cartApiCall({ action: 'create', lines: [line] });
 
-  const removeItem = useCallback((variantId: string) => {
-    setItems((prev) => prev.filter((i) => i.variantId !== variantId));
-  }, []);
-
-  const updateQuantity = useCallback((variantId: string, quantity: number) => {
-    if (quantity <= 0) {
-      setItems((prev) => prev.filter((i) => i.variantId !== variantId));
+    if (cart) {
+      syncCart(cart);
     } else {
-      setItems((prev) =>
-        prev.map((i) => (i.variantId === variantId ? { ...i, quantity } : i))
-      );
+      // Optimistic fallback when API is unreachable
+      setItems((prev) => {
+        const existing = prev.find((i) => i.variantId === newItem.variantId);
+        if (existing) {
+          return prev.map((i) =>
+            i.variantId === newItem.variantId ? { ...i, quantity: i.quantity + quantity } : i
+          );
+        }
+        return [...prev, { ...newItem, quantity }];
+      });
     }
-  }, []);
+    setIsOpen(true);
+  }, [cartId, syncCart]);
 
-  const clearCart = useCallback(() => setItems([]), []);
+  const removeItem = useCallback(async (variantId: string) => {
+    const lineId = lineIdMap.current.get(variantId);
+    if (cartId && lineId) {
+      const cart = await cartApiCall({ action: 'remove', cartId, lineIds: [lineId] });
+      if (cart) { syncCart(cart); return; }
+    }
+    setItems((prev) => prev.filter((i) => i.variantId !== variantId));
+  }, [cartId, syncCart]);
+
+  const updateQuantity = useCallback(async (variantId: string, quantity: number) => {
+    if (quantity <= 0) { removeItem(variantId); return; }
+    const lineId = lineIdMap.current.get(variantId);
+    if (cartId && lineId) {
+      const cart = await cartApiCall({
+        action: 'update',
+        cartId,
+        lines: [{ id: lineId, quantity }],
+      });
+      if (cart) { syncCart(cart); return; }
+    }
+    setItems((prev) =>
+      prev.map((i) => (i.variantId === variantId ? { ...i, quantity } : i))
+    );
+  }, [cartId, syncCart, removeItem]);
+
+  const clearCart = useCallback(() => {
+    setItems([]);
+    setCartId(null);
+    setCheckoutUrl(FALLBACK_CHECKOUT);
+    lineIdMap.current.clear();
+    try { localStorage.removeItem(CART_ID_KEY); } catch { /* ignore */ }
+  }, []);
 
   const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const checkoutUrl = items.length > 0 ? buildCheckoutUrl(items) : 'https://www.arvenzo.be/cart';
 
   return (
     <CartContext.Provider value={{

@@ -102,6 +102,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             gtag('config', 'G-6ZCTDJ7PLC');
           `}
         </Script>
+        <Script
+          src="https://rivodesk.vercel.app/analytics.js?id=198d22cb-fb0c-4b84-96db-1a6b2cdbc12d"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
