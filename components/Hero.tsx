@@ -11,7 +11,7 @@ export default function Hero() {
       {/* Background */}
       <Image
         src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2400&q=85&auto=format&fit=crop"
-        alt="Mountain landscape at night"
+          alt="Nachtelijk berglandschap – Arvenzo streetwear inspiratie"
         fill
         priority
         className="object-cover opacity-60"
@@ -58,7 +58,7 @@ export default function Hero() {
       <div className="absolute bottom-0 right-0 h-[85%] w-auto opacity-80 pointer-events-none hidden md:block">
         <Image
           src="https://cdn.shopify.com/s/files/1/0971/8543/1895/files/front-basic-unisex-hoodie-arctic-white-482-c070-2000x.png"
-          alt="Crescent Peak Hoodie"
+          alt="Arvenzo Crescent Peak Hoodie – premium streetwear hoodie arctic white"
           width={600}
           height={600}
           className="h-full w-auto object-contain object-bottom drop-shadow-2xl"

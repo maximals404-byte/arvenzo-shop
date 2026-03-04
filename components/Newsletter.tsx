@@ -29,7 +29,7 @@ export default function Newsletter() {
     <section className="relative overflow-hidden bg-arvenzo-dark py-24">
       <Image
         src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=2000&q=70&auto=format&fit=crop"
-        alt="Mountain aerial"
+        alt="Luchtfoto van berglandschap – Arvenzo outdoor lifestyle"
         fill
         className="object-cover opacity-20"
         sizes="100vw"

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { getAllProducts } from '@/lib/shopify';
 import { getShopReviews } from '@/lib/judgeme';
 import Hero from '@/components/Hero';
@@ -8,6 +9,10 @@ import LifestyleSection from '@/components/LifestyleSection';
 import BrandStory from '@/components/BrandStory';
 import Reviews from '@/components/Reviews';
 import Newsletter from '@/components/Newsletter';
+
+export const metadata: Metadata = {
+  alternates: { canonical: 'https://www.arvenzo.be' },
+};
 
 export const revalidate = 300;
 

@@ -19,7 +19,7 @@ export default function BrandStory() {
       <div className="relative h-[60vh] min-h-[400px]">
         <Image
           src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2400&q=85&auto=format&fit=crop"
-          alt="Mountain landscape"
+          alt="Berglandschap – inspiratie achter het Arvenzo merk"
           fill
           className="object-cover"
           sizes="100vw"

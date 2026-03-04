@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: '%s | Arvenzo',
   },
   description:
-    'Premium streetwear met unieke berglandschapdesigns. Hoodies, sweaters & shirts van Arvenzo – Belgisch merk, gedrukt in Europa. Gratis verzending vanaf €50.',
+    'Premium streetwear met berglandschapdesigns. Hoodies, sweaters & shirts van Arvenzo – Belgisch merk, gedrukt in Europa. Gratis verzending vanaf €50.',
   keywords: ['arvenzo', 'hoodie', 'sweatshirt', 'streetwear', 'limited edition', 'berglandschap', 'belgisch merk', 'crescent peak', 'sweater heren', 'sweater dames'],
   alternates: { canonical: 'https://www.arvenzo.be' },
   openGraph: {
