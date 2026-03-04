@@ -4,6 +4,8 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Privacybeleid | Arvenzo',
   description: 'Privacybeleid van Arvenzo conform de AVG/GDPR en Belgische privacywetgeving.',
+  alternates: { canonical: 'https://www.arvenzo.be/privacy' },
+  robots: { index: false, follow: false },
 };
 
 export default function PrivacyPage() {

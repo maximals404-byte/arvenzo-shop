@@ -7,6 +7,8 @@ import { getShipping } from '@/lib/page-content/shipping';
 export const metadata: Metadata = {
   title: 'Verzendbeleid | Arvenzo',
   description: 'Verzendbeleid van Arvenzo conform Belgisch Wetboek van Economisch Recht en EU-richtlijnen voor e-commerce.',
+  alternates: { canonical: 'https://www.arvenzo.be/shipping' },
+  robots: { index: true, follow: true },
 };
 
 export default function ShippingPage() {

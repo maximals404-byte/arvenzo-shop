@@ -7,6 +7,8 @@ import { getReturns } from '@/lib/page-content/returns';
 export const metadata: Metadata = {
   title: 'Herroepingsrecht & Retourbeleid | Arvenzo',
   description: 'Retourbeleid van Arvenzo conform Belgisch Wetboek van Economisch Recht en EU-richtlijn 2011/83/EU.',
+  alternates: { canonical: 'https://www.arvenzo.be/returns' },
+  robots: { index: true, follow: true },
 };
 
 export default function ReturnsPage() {

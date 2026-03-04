@@ -6,6 +6,8 @@ import { t } from '@/lib/translations';
 export const metadata: Metadata = {
   title: 'Maatgids | Arvenzo',
   description: 'Vind de perfecte maat met onze uitgebreide maatgids voor hoodies, sweatshirts en shirts.',
+  alternates: { canonical: 'https://www.arvenzo.be/sizing' },
+  robots: { index: true, follow: true },
 };
 
 export default function SizingPage() {

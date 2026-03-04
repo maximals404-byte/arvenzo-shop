@@ -4,6 +4,8 @@ import { getFaq } from '@/lib/page-content/faq';
 export const metadata: Metadata = {
   title: 'Veelgestelde vragen | Arvenzo',
   description: 'Antwoorden op veelgestelde vragen over verzending, retours, maatvoering en betalingen bij Arvenzo.',
+  alternates: { canonical: 'https://www.arvenzo.be/faq' },
+  robots: { index: true, follow: true },
 };
 
 const faqSchema = {

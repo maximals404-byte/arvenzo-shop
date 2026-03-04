@@ -6,7 +6,9 @@ import { t } from '@/lib/translations';
 
 export const metadata: Metadata = {
   title: 'Ons verhaal | Arvenzo',
-  description: 'Ontdek het verhaal achter Arvenzo – een Belgisch merk voor avonturiers en natuur­liefhebbers.',
+  description: 'Ontdek het verhaal achter Arvenzo – een Belgisch merk voor avonturiers en natuur­liefhebbers. Premium streetwear met berglandschapdesigns, gedrukt in Europa.',
+  alternates: { canonical: 'https://www.arvenzo.be/about' },
+  robots: { index: true, follow: true },
 };
 
 export default function AboutPage() {

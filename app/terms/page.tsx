@@ -4,6 +4,8 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Algemene Voorwaarden | Arvenzo',
   description: 'Algemene verkoopsvoorwaarden van Arvenzo conform Belgisch Wetboek van Economisch Recht en EU-consumentenwetgeving.',
+  alternates: { canonical: 'https://www.arvenzo.be/terms' },
+  robots: { index: false, follow: false },
 };
 
 export default function TermsPage() {

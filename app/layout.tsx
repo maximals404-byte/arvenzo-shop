@@ -14,15 +14,16 @@ import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Arvenzo — Draag het avontuur.',
+    default: 'Arvenzo — Premium Streetwear Hoodies & Sweaters | België',
     template: '%s | Arvenzo',
   },
   description:
-    'Premium limited edition streetwear met berglandschap designs. Hoodies, sweatshirts, shirts & mugs. Belgisch merk, gedrukt in Europa.',
-  keywords: ['arvenzo', 'hoodie', 'sweatshirt', 'limited edition', 'mountain', 'crescent peak'],
+    'Premium streetwear met unieke berglandschapdesigns. Hoodies, sweaters & shirts van Arvenzo – Belgisch merk, gedrukt in Europa. Gratis verzending vanaf €50.',
+  keywords: ['arvenzo', 'hoodie', 'sweatshirt', 'streetwear', 'limited edition', 'berglandschap', 'belgisch merk', 'crescent peak', 'sweater heren', 'sweater dames'],
+  alternates: { canonical: 'https://www.arvenzo.be' },
   openGraph: {
-    title: 'Arvenzo — Draag het avontuur.',
-    description: 'Premium limited edition streetwear voor wie de bergen voelt.',
+    title: 'Arvenzo — Premium Streetwear Hoodies & Sweaters | België',
+    description: 'Premium streetwear met unieke berglandschapdesigns. Hoodies, sweaters & shirts – Belgisch merk, gedrukt in Europa.',
     url: 'https://www.arvenzo.be',
     siteName: 'Arvenzo',
     locale: 'nl_BE',
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
       width: 2000, height: 2000, alt: 'Arvenzo Crescent Peak Hoodie',
     }],
   },
-  robots: { index: true, follow: true },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   twitter: { card: 'summary_large_image', site: '@arvenzo' },
 };
 
@@ -53,6 +54,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </LanguageProvider>
           </CartProvider>
         </AuthProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'Arvenzo',
+            url: 'https://www.arvenzo.be',
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: { '@type': 'EntryPoint', urlTemplate: 'https://www.arvenzo.be/products?q={search_term_string}' },
+              'query-input': 'required name=search_term_string',
+            },
+          }) }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
