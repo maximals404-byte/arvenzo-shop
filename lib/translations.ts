@@ -666,10 +666,10 @@ const translations: Record<string, Record<string, string>> = {
   },
   'about.value3.title': { nl: 'Belgisch', fr: 'Belge', de: 'Belgisch', en: 'Belgian' },
   'about.value3.body': {
-    nl: 'Opgericht in Begijnendijk, gedrukt in Europa. Trots op onze roots, met een open blik op de wereld.',
-    fr: "Fondé à Begijnendijk, imprimé en Europe. Fier de nos racines, avec un regard ouvert sur le monde.",
-    de: 'Gegründet in Begijnendijk, gedruckt in Europa. Stolz auf unsere Wurzeln, mit einem offenen Blick auf die Welt.',
-    en: 'Founded in Begijnendijk, printed in Europe. Proud of our roots, with an open view of the world.',
+    nl: 'Opgericht in Vlaams-Brabant, gedrukt in Europa. Trots op onze roots, met een open blik op de wereld.',
+    fr: "Fondé en Brabant flamand, imprimé en Europe. Fier de nos racines, avec un regard ouvert sur le monde.",
+    de: 'Gegründet in Flämisch-Brabant, gedruckt in Europa. Stolz auf unsere Wurzeln, mit einem offenen Blick auf die Welt.',
+    en: 'Founded in Flemish Brabant, printed in Europe. Proud of our roots, with an open view of the world.',
   },
   'about.story.title': {
     nl: 'Het begin', fr: 'Les débuts', de: 'Der Anfang', en: 'The beginning',
