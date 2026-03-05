@@ -52,7 +52,20 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | null>(null);
 const CART_ID_KEY = 'arvenzo-cart-id';
-const FALLBACK_CHECKOUT = 'https://2bpbqi-n3.myshopify.com/cart';
+const STORE = 'https://2bpbqi-n3.myshopify.com';
+const FALLBACK_CHECKOUT = `${STORE}/cart`;
+
+// Numeric ID uit GID of plain string halen
+function numericId(id: string): string {
+  return id.startsWith('gid://') ? (id.split('/').pop() ?? id) : id;
+}
+
+// Fallback checkout URL vanuit lokale items (werkt altijd, ook zonder Storefront API)
+function localCheckoutUrl(items: CartItem[]): string {
+  if (!items.length) return FALLBACK_CHECKOUT;
+  const parts = items.map(i => `${numericId(i.variantId)}:${i.quantity}`).join(',');
+  return `${STORE}/cart/${parts}`;
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -180,10 +193,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  // Gebruik Shopify checkout URL als die beschikbaar is, anders lokale fallback
+  const effectiveCheckoutUrl = (checkoutUrl !== FALLBACK_CHECKOUT)
+    ? checkoutUrl
+    : localCheckoutUrl(items);
 
   return (
     <CartContext.Provider value={{
-      items, isOpen, totalQuantity, subtotal, checkoutUrl,
+      items, isOpen, totalQuantity, subtotal, checkoutUrl: effectiveCheckoutUrl,
       openCart, closeCart, addItem, removeItem, updateQuantity, clearCart,
     }}>
       {children}
