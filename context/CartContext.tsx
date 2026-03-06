@@ -96,26 +96,6 @@ async function cartApiCall(body: Record<string, unknown>): Promise<ShopifyCart |
   }
 }
 
-// Try to get a direct Shopify checkout URL from current items (via checkoutCreate).
-// Returns null if the Storefront API is unavailable.
-async function fetchCheckoutUrl(items: CartItem[]): Promise<string | null> {
-  if (!items.length) return null;
-  try {
-    const res = await fetch('/api/cart', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'checkout',
-        lineItems: items.map(i => ({ variantId: i.variantId, quantity: i.quantity })),
-      }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.checkoutUrl ?? null;
-  } catch {
-    return null;
-  }
-}
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
@@ -155,19 +135,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
-  // Updates checkoutUrl in the background after an optimistic local change.
-  // When the Storefront API token is valid, this returns a direct checkout URL.
+  // Sets the fallback cart-page URL when the Storefront API cart sync fails.
   const refreshCheckoutUrl = useCallback((newItems: CartItem[]) => {
-    if (!newItems.length) {
-      setCheckoutUrl(FALLBACK_CHECKOUT);
-      return;
-    }
-    // Optimistic: set cart-page URL immediately so the button is always clickable
-    setCheckoutUrl(localCartUrl(newItems));
-    // Then try to upgrade to a direct checkout URL in the background
-    fetchCheckoutUrl(newItems).then(url => {
-      if (url) setCheckoutUrl(url);
-    });
+    setCheckoutUrl(newItems.length ? localCartUrl(newItems) : FALLBACK_CHECKOUT);
   }, []);
 
   const addItem = useCallback(async (newItem: Omit<CartItem, 'quantity'>, quantity = 1) => {

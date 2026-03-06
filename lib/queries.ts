@@ -402,20 +402,6 @@ export const UPDATE_CART_MUTATION = `
   }
 `;
 
-export const CHECKOUT_CREATE_MUTATION = `
-  mutation CheckoutCreate($lineItems: [CheckoutLineItemInput!]!) {
-    checkoutCreate(input: { lineItems: $lineItems }) {
-      checkout {
-        id
-        webUrl
-      }
-      checkoutUserErrors {
-        message
-      }
-    }
-  }
-`;
-
 export const GET_CART_QUERY = `
   query GetCart($cartId: ID!) {
     cart(id: $cartId) {
