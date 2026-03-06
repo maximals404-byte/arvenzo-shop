@@ -60,8 +60,8 @@ function numericId(id: string): string {
   return id.startsWith('gid://') ? (id.split('/').pop() ?? id) : id;
 }
 
-// Fallback checkout URL vanuit lokale items (werkt altijd, ook zonder Storefront API)
-function localCheckoutUrl(items: CartItem[]): string {
+// Fallback cart URL when Storefront API is unavailable
+function localCartUrl(items: CartItem[]): string {
   if (!items.length) return FALLBACK_CHECKOUT;
   const parts = items.map(i => `${numericId(i.variantId)}:${i.quantity}`).join(',');
   return `${STORE}/cart/${parts}`;
@@ -91,6 +91,27 @@ async function cartApiCall(body: Record<string, unknown>): Promise<ShopifyCart |
     if (!res.ok) return null;
     const data = await res.json();
     return data.cart ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// Try to get a direct Shopify checkout URL from current items (via checkoutCreate).
+// Returns null if the Storefront API is unavailable.
+async function fetchCheckoutUrl(items: CartItem[]): Promise<string | null> {
+  if (!items.length) return null;
+  try {
+    const res = await fetch('/api/cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'checkout',
+        lineItems: items.map(i => ({ variantId: i.variantId, quantity: i.quantity })),
+      }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.checkoutUrl ?? null;
   } catch {
     return null;
   }
@@ -134,6 +155,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
+  // Updates checkoutUrl in the background after an optimistic local change.
+  // When the Storefront API token is valid, this returns a direct checkout URL.
+  const refreshCheckoutUrl = useCallback((newItems: CartItem[]) => {
+    if (!newItems.length) {
+      setCheckoutUrl(FALLBACK_CHECKOUT);
+      return;
+    }
+    // Optimistic: set cart-page URL immediately so the button is always clickable
+    setCheckoutUrl(localCartUrl(newItems));
+    // Then try to upgrade to a direct checkout URL in the background
+    fetchCheckoutUrl(newItems).then(url => {
+      if (url) setCheckoutUrl(url);
+    });
+  }, []);
+
   const addItem = useCallback(async (newItem: Omit<CartItem, 'quantity'>, quantity = 1) => {
     const line = { merchandiseId: newItem.variantId, quantity };
     const cart = cartId
@@ -144,19 +180,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
       syncCart(cart);
       trackAddToCart(cart.id, { ...newItem, quantity });
     } else {
-      // Optimistic fallback when API is unreachable
+      // Optimistic fallback: update local state and refresh checkout URL
       setItems((prev) => {
         const existing = prev.find((i) => i.variantId === newItem.variantId);
-        if (existing) {
-          return prev.map((i) =>
-            i.variantId === newItem.variantId ? { ...i, quantity: i.quantity + quantity } : i
-          );
-        }
-        return [...prev, { ...newItem, quantity }];
+        const newItems = existing
+          ? prev.map((i) => i.variantId === newItem.variantId ? { ...i, quantity: i.quantity + quantity } : i)
+          : [...prev, { ...newItem, quantity }];
+        refreshCheckoutUrl(newItems);
+        return newItems;
       });
     }
     setIsOpen(true);
-  }, [cartId, syncCart]);
+  }, [cartId, syncCart, refreshCheckoutUrl]);
 
   const removeItem = useCallback(async (variantId: string) => {
     const lineId = lineIdMap.current.get(variantId);
@@ -164,8 +199,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const cart = await cartApiCall({ action: 'remove', cartId, lineIds: [lineId] });
       if (cart) { syncCart(cart); return; }
     }
-    setItems((prev) => prev.filter((i) => i.variantId !== variantId));
-  }, [cartId, syncCart]);
+    setItems((prev) => {
+      const newItems = prev.filter((i) => i.variantId !== variantId);
+      refreshCheckoutUrl(newItems);
+      return newItems;
+    });
+  }, [cartId, syncCart, refreshCheckoutUrl]);
 
   const updateQuantity = useCallback(async (variantId: string, quantity: number) => {
     if (quantity <= 0) { removeItem(variantId); return; }
@@ -178,10 +217,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       });
       if (cart) { syncCart(cart); return; }
     }
-    setItems((prev) =>
-      prev.map((i) => (i.variantId === variantId ? { ...i, quantity } : i))
-    );
-  }, [cartId, syncCart, removeItem]);
+    setItems((prev) => {
+      const newItems = prev.map((i) => i.variantId === variantId ? { ...i, quantity } : i);
+      refreshCheckoutUrl(newItems);
+      return newItems;
+    });
+  }, [cartId, syncCart, removeItem, refreshCheckoutUrl]);
 
   const clearCart = useCallback(() => {
     setItems([]);
@@ -193,14 +234,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  // Gebruik Shopify checkout URL als die beschikbaar is, anders lokale fallback
-  const effectiveCheckoutUrl = (checkoutUrl !== FALLBACK_CHECKOUT)
-    ? checkoutUrl
-    : localCheckoutUrl(items);
 
   return (
     <CartContext.Provider value={{
-      items, isOpen, totalQuantity, subtotal, checkoutUrl: effectiveCheckoutUrl,
+      items, isOpen, totalQuantity, subtotal, checkoutUrl,
       openCart, closeCart, addItem, removeItem, updateQuantity, clearCart,
     }}>
       {children}
