@@ -7,10 +7,36 @@ import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { formatPrice } from '@/lib/shopify';
 import CartCrossSell from './CartCrossSell';
+import { useState } from 'react';
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, subtotal, checkoutUrl, totalQuantity } = useCart();
   const { t } = useLanguage();
+  const [checkingOut, setCheckingOut] = useState(false);
+
+  async function handleCheckout() {
+    setCheckingOut(true);
+    try {
+      const res = await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'checkout',
+          lineItems: items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.checkoutUrl) {
+          window.location.href = data.checkoutUrl;
+          return;
+        }
+      }
+    } catch { /* fall through to fallback */ }
+    // Fallback: use pre-computed checkout URL from context
+    window.location.href = checkoutUrl;
+    setCheckingOut(false);
+  }
 
   const shippingNote = subtotal >= 50
     ? t('cart.free_shipping')
@@ -116,10 +142,12 @@ export default function CartDrawer() {
               <span className="font-heading font-bold text-arvenzo-ink text-lg">{formatPrice(subtotal)}</span>
             </div>
             <p className="text-[11px] text-arvenzo-muted font-sans">{shippingNote}</p>
-            <a href={checkoutUrl}
-              className="w-full flex items-center justify-center bg-arvenzo-brown text-arvenzo-cream font-heading font-bold py-4 rounded-full hover:bg-arvenzo-brown-light active:scale-[0.98] transition-all text-[15px] tracking-wide">
-              {t('cart.checkout')} →
-            </a>
+            <button
+              onClick={handleCheckout}
+              disabled={checkingOut}
+              className="w-full flex items-center justify-center bg-arvenzo-brown text-arvenzo-cream font-heading font-bold py-4 rounded-full hover:bg-arvenzo-brown-light active:scale-[0.98] transition-all text-[15px] tracking-wide disabled:opacity-70 disabled:cursor-not-allowed">
+              {checkingOut ? '...' : `${t('cart.checkout')} →`}
+            </button>
             <button onClick={closeCart}
               className="w-full text-center text-sm text-arvenzo-muted hover:text-arvenzo-ink transition-colors font-sans">
               {t('cart.continue')}

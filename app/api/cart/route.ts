@@ -5,6 +5,7 @@ import {
   REMOVE_FROM_CART_MUTATION,
   UPDATE_CART_MUTATION,
   GET_CART_QUERY,
+  CHECKOUT_CREATE_MUTATION,
 } from '@/lib/queries';
 
 const STOREFRONT_URL = `https://${process.env.SHOPIFY_STORE_DOMAIN}/api/2024-07/graphql.json`;
@@ -58,6 +59,16 @@ export async function POST(req: NextRequest) {
       case 'get':
         data = await storefrontFetch(GET_CART_QUERY, { cartId });
         break;
+      case 'checkout': {
+        const lineItems = (body.lineItems as { variantId: string; quantity: number }[]).map(
+          (i) => ({ variantId: i.variantId, quantity: i.quantity })
+        );
+        data = await storefrontFetch(CHECKOUT_CREATE_MUTATION, { lineItems });
+        const webUrl = (data?.data as Record<string, Record<string, Record<string, string>>>)
+          ?.checkoutCreate?.checkout?.webUrl;
+        if (webUrl) return NextResponse.json({ checkoutUrl: webUrl });
+        return NextResponse.json({ error: 'No checkout URL' }, { status: 500 });
+      }
       default:
         return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
     }
