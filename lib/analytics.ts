@@ -32,8 +32,7 @@ function basePayload() {
   return {
     shopId: SHOP_ID,
     acceptedLanguage: 'NL' as const,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    currency: 'EUR' as any,
+    currency: 'EUR' as never,
     hydrogenSubchannelId: '0',
     hasUserConsent: getHasConsent(),
   };
